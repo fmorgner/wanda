@@ -20,12 +20,17 @@ include("ConanDependencies")
 include("SystemDependencies")
 
 add_executable("wanda"
+  # Executable
   "src/main.cpp"
+
+  # Components
+  "src/deferred_failure.hpp"
+  "src/optional.hpp"
   "src/setting.cpp"
   "src/setting.hpp"
-  "src/variant.cpp"
-  "src/variant.hpp"
+  "src/type_wrapper.hpp"
   )
+
 target_link_libraries("wanda"
   "CONAN_PKG::boost_config"
   "SYSTEM::GIO"

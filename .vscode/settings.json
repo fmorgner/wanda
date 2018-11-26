@@ -8,6 +8,8 @@
         "initializer_list": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "variant": "cpp",
+        "string_view": "cpp"
     }
 }

@@ -1,48 +1,154 @@
+/**
+ * @file    setting.hpp
+ * @author  Felix Morgner (felix.morgner@gmail.com)
+ * @since   1.0.0
+ */
+
 #ifndef WANDA_setting_HPP
 #define WANDA_setting_HPP
 
+#include "deferred_failure.hpp"
+#include "type_wrapper.hpp"
+
 #include <gio/gio.h>
 
+#include <algorithm>
 #include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <optional>
 #include <string>
-#include <type_traits>
+#include <variant>
+#include <vector>
 
-#include "type_wrapper.hpp"
-#include "variant.hpp"
-#include <iostream>
-
-namespace wanda {
+namespace wanda
+{
 
 struct setting;
-using schema = type_wrapper<std::string, struct SchemaTag>;
+
+/**
+ * @brief A convenience type to represent setting keys
+ */
 using key = type_wrapper<std::string, struct KeyTag>;
 
-namespace literals {
-key operator""_key(char const * str, std::size_t len);
-std::optional<setting> operator""_setting(char const * str, std::size_t len);
-}
+namespace literals
+{
+/**
+ * @brief UDL to create setting keys
+ */
+key operator""_key(char const *str, std::size_t len);
 
-struct setting {
-    ~setting();
+/**
+ * @brief UDL to create setting schemas
+ */
+std::optional<setting> operator""_setting(char const *str, std::size_t lent);
+} // namespace literals
 
-    setting(setting const & other);
+/**
+ * @brief A simple wrapper for GSettings Schemas
+ */
+struct setting
+{
+  struct entry
+  {
 
-    template<typename TargetType> std::optional<TargetType> get(key key) const {
-        auto value = variant{g_settings_get_value(m_value, key.get().c_str())};
-        return value.get<TargetType>();
+    using value_type = std::variant<std::monostate, bool, std::int32_t, std::int64_t, std::uint32_t, std::uint64_t, double, std::string, std::vector<std::string>>;
+
+    value_type operator*() const;
+
+    template <typename Type>
+    bool operator=(Type value)
+    {
+      struct setting_applier
+      {
+        setting_applier(GSettings *setting, gchar const *key, Type value) noexcept
+            : m_result{[&] {
+                if constexpr (std::is_same_v<Type, bool>)
+                {
+                  return g_settings_set_boolean(setting, key, value);
+                }
+                else if constexpr (std::is_same_v<Type, std::int32_t>)
+                {
+                  return g_settings_set_int(setting, key, value);
+                }
+                else if constexpr (std::is_same_v<Type, std::int64_t>)
+                {
+                  return g_settings_set_int64(setting, key, value);
+                }
+                else if constexpr (std::is_same_v<Type, std::uint32_t>)
+                {
+                  return g_settings_set_uint(setting, key, value);
+                }
+                else if constexpr (std::is_same_v<Type, std::uint64_t>)
+                {
+                  return g_settings_set_uint64(setting, key, value);
+                }
+                else if constexpr (std::is_same_v<Type, double>)
+                {
+                  return g_settings_set_double(setting, key, value);
+                }
+                else if constexpr (std::is_same_v<Type, std::string>)
+                {
+                  return g_settings_set_string(setting, key, value.c_str());
+                }
+                else if constexpr (std::is_same_v<Type, std::vector<std::string>>)
+                {
+                  auto temp = std::vector<gchar const *>{value.size() + 1};
+                  std::transform(value.begin(), value.end(), temp.begin(), [](auto const &str) { return str.c_str(); });
+                  return g_settings_set_strv(setting, key, temp.data());
+                }
+                else
+                {
+                  static_assert(deferred_failure<Type>{}, "Invalid argument type!");
+                }
+              }()}
+        {
+        }
+
+        ~setting_applier()
+        {
+          g_settings_sync();
+        }
+
+        operator bool() const
+        {
+          return m_result;
+        }
+
+      private:
+        gboolean const m_result;
+      };
+
+      return setting_applier{m_settings.get(), m_key.get().c_str(), value};
     }
 
+  private:
+    entry(setting const &schema, key key);
+
+    std::unique_ptr<GSettings, decltype(&g_object_unref)> m_settings;
+
+    key m_key;
+
+    friend setting;
+  };
+
+  /**
+   * @brief Get the entry for the given key
+   * 
+   * @return An <code>std::optional</code> wrapping the entry associated with
+   * the given key, or an empty <code>std::optional</code> if the desired key
+   * does not exist in the setting's schema.
+   */
+  std::optional<entry> operator[](key key) const;
+
 private:
-    explicit setting(schema schema);
+  explicit setting(GSettingsSchema *schema);
 
-    GSettings * m_value;
+  std::unique_ptr<GSettingsSchema, decltype(&g_settings_schema_unref)> m_schema;
 
-    friend std::optional<setting> literals::operator""_setting(char const *, std::size_t);
+  friend std::optional<setting> literals::operator""_setting(char const *, std::size_t);
 };
 
-
-}
-
+} // namespace wanda
 
 #endif
