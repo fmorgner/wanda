@@ -10,6 +10,7 @@
         "utility": "cpp",
         "string": "cpp",
         "variant": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "ostream": "cpp"
     }
 }

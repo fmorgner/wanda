@@ -14,6 +14,7 @@ class Wanda(ConanFile):
     )
     requires = (
         "boost_program_options/1.67.0@bincrafters/stable",
+        "boost_iterator/1.67.0@bincrafters/stable",
     )
 
     def build(self):

@@ -25,6 +25,8 @@ add_executable("wanda"
 
   # Components
   "src/deferred_failure.hpp"
+  "src/filesystem.cpp"
+  "src/filesystem.hpp"
   "src/optional.hpp"
   "src/setting.cpp"
   "src/setting.hpp"
@@ -33,5 +35,6 @@ add_executable("wanda"
 
 target_link_libraries("wanda"
   "CONAN_PKG::boost_config"
+  "SYSTEM::C++FS"
   "SYSTEM::GIO"
   )

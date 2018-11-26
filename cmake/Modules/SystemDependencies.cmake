@@ -1,5 +1,12 @@
 find_package("PkgConfig" REQUIRED)
 
+find_library(C++FS_LIBRARIES "stdc++fs" DOC "The C++ Standard Library Filesystem implementation")
+if(NOT C++FS_LIBRARIES)
+  message(FATAL_ERROR "Failed to find libstdc++fs")
+endif()
+add_library("SYSTEM::C++FS" INTERFACE IMPORTED)
+set_property(TARGET "SYSTEM::C++FS" PROPERTY INTERFACE_LINK_LIBRARIES ${C++FS_LIBRARIES})
+
 pkg_check_modules("GIO" "gio-2.0" REQUIRED)
 add_library("SYSTEM::GIO" INTERFACE IMPORTED)
 set_property(TARGET "SYSTEM::GIO" PROPERTY INTERFACE_LINK_LIBRARIES ${GIO_LIBRARIES})
