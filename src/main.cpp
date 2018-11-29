@@ -3,6 +3,9 @@
 #include "optional.hpp"
 #include "control_interface.hpp"
 
+#include <boost/asio.hpp>
+
+#include <csignal>
 #include <iostream>
 #include <set>
 #include <string>
@@ -50,9 +53,21 @@ int main()
 
     auto service = boost::asio::io_service{};
     auto interface = wanda::make_interface(service, ".wanda_interface");
-    std::cout << interface.use_count() << '\n';
     auto status = interface->start();
-    std::cout << status << ' ' << status.message() << '\n';
+
+    if(status)
+    {
+      return;
+    }
+
+    auto signals = boost::asio::signal_set{service, SIGINT};
+    signals.async_wait([&](auto const & error, auto const signal){
+      if(!error && signal == SIGINT)
+      {
+        service.stop();
+      }
+    });
+
     service.run();
   }) || [] { std::cerr << "Directory does not exist\n"; };
 }
