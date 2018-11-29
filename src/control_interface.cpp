@@ -2,12 +2,12 @@
 
 #include <boost/system/error_code.hpp>
 
+#include <unistd.h>
+
 #include <algorithm>
 #include <iterator>
 #include <string>
 #include <utility>
-
-#include <iostream>
 
 namespace wanda
 {
@@ -40,11 +40,6 @@ boost::system::error_code control_interface::start()
         return error;
     }
 
-    if (auto error = boost::system::error_code{}; m_acceptor.set_option(boost::asio::socket_base::reuse_address(true), error))
-    {
-        return error;
-    }
-
     if (auto error = boost::system::error_code{}; m_acceptor.bind(m_endpoint, error))
     {
         return error;
@@ -61,10 +56,21 @@ boost::system::error_code control_interface::start()
     }
 }
 
+boost::system::error_code control_interface::shutdown()
+{
+    for(auto & connection : m_connections)
+    {
+        connection->close();
+    }
+
+    auto error = boost::system::error_code{};
+    return m_acceptor.close(error);
+}
+
 void control_interface::perform_accept()
 {
     m_acceptor.async_accept(m_socket, [that = shared_from_this(), this](auto const &error) {
-        if (error)
+        if (error && error != boost::asio::error::operation_aborted)
         {
             // TODO: Handle error
         }
@@ -73,7 +79,6 @@ void control_interface::perform_accept()
             auto [connection, inserted] = m_connections.insert(make_control_connection(std::move(m_socket)));
             if(inserted)
             {
-                std::cout << "Accepted a new connection\n";
                 (*connection)->add(shared_from_this());
                 (*connection)->start();
             }
@@ -82,14 +87,8 @@ void control_interface::perform_accept()
     });
 }
 
-void control_interface::on_received(control_connection::pointer, std::string message)
-{
-    std::cout << "Received '" << message << "'\n";
-}
-
 void control_interface::on_close(control_connection::pointer connection)
 {
-    std::cout << "Connection closed\n";
     m_connections.erase(connection);
 }
 

@@ -31,8 +31,8 @@ struct control_interface : control_connection::listener, keyed<control_interface
     control_interface(key, boost::asio::io_service &service, protocol::endpoint endpoint);
 
     boost::system::error_code start();
+    boost::system::error_code shutdown();
 
-    void on_received(control_connection::pointer connection, std::string message) override;
     void on_close(control_connection::pointer) override;
 
   private:

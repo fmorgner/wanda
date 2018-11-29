@@ -36,6 +36,8 @@ add_executable("wanda"
   "src/setting.cpp"
   "src/setting.hpp"
   "src/type_wrapper.hpp"
+  "src/wallpaper.cpp"
+  "src/wallpaper.hpp"
   )
 
 target_link_libraries("wanda"
