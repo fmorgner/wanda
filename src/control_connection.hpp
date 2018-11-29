@@ -5,7 +5,9 @@
 
 #include <boost/asio.hpp>
 
+#include <istream>
 #include <memory>
+#include <ostream>
 #include <set>
 #include <string>
 
@@ -56,6 +58,8 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
      */
     void close();
 
+    void send(std::string message);
+
   private:
     friend pointer make_control_connection(protocol::socket &&socket);
 
@@ -65,6 +69,7 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
     boost::asio::streambuf m_in{};
     boost::asio::streambuf m_out{};
     std::istream m_input{&m_in};
+    std::ostream m_output{&m_out};
     std::set<std::shared_ptr<listener>> m_listeners{};
     bool m_running{};
 };

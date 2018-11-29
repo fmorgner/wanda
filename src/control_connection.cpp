@@ -34,6 +34,21 @@ void control_connection::start()
     }
 }
 
+void control_connection::send(std::string message)
+{
+    m_output << message;
+    boost::asio::async_write(m_socket, m_out, boost::asio::transfer_exactly(message.size()), [that = shared_from_this(), this](auto const &error, auto const length) {
+        if (error)
+        {
+            // TODO: Handle error
+        }
+        else
+        {
+            m_out.consume(length);
+        }
+    });
+}
+
 void control_connection::close()
 {
     if (auto error = boost::system::error_code{}; m_socket.cancel(error))
