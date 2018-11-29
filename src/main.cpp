@@ -1,6 +1,7 @@
 #include "filesystem.hpp"
 #include "setting.hpp"
 #include "optional.hpp"
+#include "control_interface.hpp"
 
 #include <iostream>
 #include <set>
@@ -46,5 +47,12 @@ int main()
     auto wallpaper = wanda::random_pick(list);
     std::cout << "changing wallpaper to " << wallpaper << '\n';
     set_wallpaper(wallpaper);
+
+    auto service = boost::asio::io_service{};
+    auto interface = wanda::make_interface(service, ".wanda_interface");
+    std::cout << interface.use_count() << '\n';
+    auto status = interface->start();
+    std::cout << status << ' ' << status.message() << '\n';
+    service.run();
   }) || [] { std::cerr << "Directory does not exist\n"; };
 }

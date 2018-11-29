@@ -24,9 +24,14 @@ add_executable("wanda"
   "src/main.cpp"
 
   # Components
+  "src/control_connection.cpp"
+  "src/control_connection.hpp"
+  "src/control_interface.cpp"
+  "src/control_interface.hpp"
   "src/deferred_failure.hpp"
   "src/filesystem.cpp"
   "src/filesystem.hpp"
+  "src/keyed.hpp"
   "src/optional.hpp"
   "src/setting.cpp"
   "src/setting.hpp"
@@ -34,7 +39,10 @@ add_executable("wanda"
   )
 
 target_link_libraries("wanda"
+  "CONAN_PKG::boost_asio"
   "CONAN_PKG::boost_config"
+  "CONAN_PKG::boost_program_options"
   "SYSTEM::C++FS"
   "SYSTEM::GIO"
+  "Threads::Threads"
   )
