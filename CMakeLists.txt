@@ -32,6 +32,8 @@ add_library("core" OBJECT
 
 target_link_libraries("core"
   "CONAN_PKG::boost_asio"
+  "SYSTEM::C++FS"
+  "Threads::Threads"
 )
 
 add_executable("wandad"
@@ -45,16 +47,15 @@ add_executable("wandad"
   )
 
 target_link_libraries("wandad"
-  # Internal components
   "core"
-
-  # Conan dependencies
   "CONAN_PKG::boost_program_options"
-
-  # System dependencies
-  "SYSTEM::C++FS"
   "SYSTEM::GIO"
-
-  # CMake dependencies
-  "Threads::Threads"
   )
+
+add_executable("wandac"
+  "src/wandac.cpp"
+)
+
+target_link_libraries("wandac"
+  "core"
+)
