@@ -19,32 +19,42 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
 include("ConanDependencies")
 include("SystemDependencies")
 
-add_executable("wanda"
-  # Executable
-  "src/main.cpp"
-
-  # Components
+add_library("core" OBJECT
   "src/control_connection.cpp"
   "src/control_connection.hpp"
   "src/control_interface.cpp"
   "src/control_interface.hpp"
   "src/deferred_failure.hpp"
-  "src/filesystem.cpp"
-  "src/filesystem.hpp"
   "src/keyed.hpp"
   "src/optional.hpp"
+  "src/type_wrapper.hpp"
+)
+
+target_link_libraries("core"
+  "CONAN_PKG::boost_asio"
+)
+
+add_executable("wandad"
+  "src/filesystem.cpp"
+  "src/filesystem.hpp"
   "src/setting.cpp"
   "src/setting.hpp"
-  "src/type_wrapper.hpp"
   "src/wallpaper.cpp"
   "src/wallpaper.hpp"
+  "src/wandad.cpp"
   )
 
-target_link_libraries("wanda"
-  "CONAN_PKG::boost_asio"
-  "CONAN_PKG::boost_config"
+target_link_libraries("wandad"
+  # Internal components
+  "core"
+
+  # Conan dependencies
   "CONAN_PKG::boost_program_options"
+
+  # System dependencies
   "SYSTEM::C++FS"
   "SYSTEM::GIO"
+
+  # CMake dependencies
   "Threads::Threads"
   )
