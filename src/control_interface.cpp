@@ -79,7 +79,6 @@ void control_interface::perform_accept()
             auto [connection, inserted] = m_connections.insert(make_control_connection(std::move(m_socket)));
             if (inserted)
             {
-                m_states[*connection] = state::fresh;
                 (*connection)->add(this);
                 (*connection)->start();
             }
@@ -95,19 +94,19 @@ void control_interface::on_close(control_connection::pointer connection)
 
 void control_interface::on_received(control_connection::pointer connection, message message)
 {
-    if (m_states.find(connection) == m_states.cend())
+    if (m_connections.find(connection) == m_connections.cend())
     {
         // TODO: Handle unknown connection
         return;
     }
 
-    switch (m_states[connection])
+    switch (connection->current_state())
     {
-    case state::fresh:
+    case control_connection::state::fresh:
         if (message.command == "HELLO")
         {
-            m_states[connection] = state::greeted;
             connection->send({"D", "HELLO", "1.0.0"});
+            connection->update(control_connection::state::established);
         }
     }
 }

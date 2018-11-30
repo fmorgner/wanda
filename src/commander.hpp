@@ -18,7 +18,6 @@ struct commander : wanda::control_connection::listener
   commander(boost::asio::io_service &service, std::filesystem::path socket);
 
   void start();
-  void send(message message);
 
   void on_error(wanda::control_connection::pointer connection, boost::system::error_code error) override;
   void on_received(wanda::control_connection::pointer connection, message message) override;

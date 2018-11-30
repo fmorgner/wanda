@@ -40,12 +40,6 @@ struct control_interface : control_connection::listener, keyed<control_interface
     void on_received(control_connection::pointer connection, message message) override;
 
   private:
-    enum struct state : std::underlying_type_t<std::byte>
-    {
-        fresh,
-        greeted,
-    };
-
     void perform_accept();
 
     friend pointer make_interface(boost::asio::io_service &service, std::filesystem::path file);
@@ -56,7 +50,6 @@ struct control_interface : control_connection::listener, keyed<control_interface
     protocol::acceptor m_acceptor;
     socket_deleter m_deleter{m_endpoint.path()};
     std::set<control_connection::pointer> m_connections;
-    std::map<control_connection::pointer, state> m_states;
 };
 
 control_interface::pointer make_interface(boost::asio::io_service &service, std::filesystem::path file);

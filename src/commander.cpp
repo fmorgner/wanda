@@ -22,22 +22,12 @@ void commander::start()
         }
         else
         {
-            std::clog << "[commander::start] Control connection established\n";
             m_connection = wanda::make_control_connection(std::move(m_socket));
             m_connection->add(this);
             m_connection->start();
-            send({"C", "HELLO", "1.0.0"});
+            m_connection->send({"C", "HELLO", "1.0.0"});
         }
     });
-}
-
-void commander::send(message message)
-{
-    if (m_connection)
-    {
-        std::clog << "[commander::send] sending message: " << message << '\n';
-        m_connection->send(std::move(message));
-    }
 }
 
 void commander::on_error(wanda::control_connection::pointer connection, boost::system::error_code error)
@@ -47,7 +37,14 @@ void commander::on_error(wanda::control_connection::pointer connection, boost::s
 
 void commander::on_received(wanda::control_connection::pointer connection, message message)
 {
-    std::clog << "[commander::on_receive] Received message: " << message << '\n';
+    if (auto state = connection->current_state(); message.command == "HELLO" && state == control_connection::state::fresh)
+    {
+        connection->update(control_connection::state::established);
+    }
+    else
+    {
+        std::cerr << "[commander::on_receive] unexpected message: " << message << '\n';
+    }
 }
 
 } // namespace wanda

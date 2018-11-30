@@ -30,9 +30,9 @@ bool control_connection::remove(listener * listener)
 
 void control_connection::start()
 {
-    if (!m_running)
+    if (m_state == state::unknown)
     {
-        m_running = true;
+        m_state = state::fresh;
         perform_read();
     }
 }
@@ -75,6 +75,16 @@ void control_connection::close()
         listener->on_close(shared_from_this());
     }
     m_listeners.clear();
+}
+
+void control_connection::update(state state)
+{
+    m_state = state;
+}
+
+control_connection::state control_connection::current_state() const
+{
+    return m_state;
 }
 
 void control_connection::perform_read()
