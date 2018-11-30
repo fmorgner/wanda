@@ -1,5 +1,8 @@
 #include "control_connection.hpp"
 
+#include <iostream>
+#include <limits>
+
 namespace wanda
 {
 
@@ -34,10 +37,10 @@ void control_connection::start()
     }
 }
 
-void control_connection::send(std::string message)
+void control_connection::send(message message)
 {
-    m_output << message;
-    boost::asio::async_write(m_socket, m_out, boost::asio::transfer_exactly(message.size()), [that = shared_from_this(), this](auto const &error, auto const length) {
+    m_output << message << '\n';
+    boost::asio::async_write(m_socket, m_out, boost::asio::transfer_exactly(message.size() + 1), [that = shared_from_this(), this](auto const &error, auto const length) {
         if (error)
         {
             // TODO: Handle error
@@ -87,11 +90,19 @@ void control_connection::perform_read()
         }
         else
         {
-            std::string message{};
-            std::getline(m_input, message);
-            for (auto &listener : m_listeners)
+            auto msg = message{};
+            m_input >> msg;
+            m_input.ignore(std::numeric_limits<std::streamsize>::max());
+            if (!m_input)
             {
-                listener->on_received(shared_from_this(), message);
+                m_input.clear();
+            }
+            else
+            {
+                for (auto &listener : m_listeners)
+                {
+                    listener->on_received(shared_from_this(), msg);
+                }
             }
             perform_read();
         }

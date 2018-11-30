@@ -2,6 +2,7 @@
 #define WANDA_CONTROL_CONNECTION_HPP
 
 #include "keyed.hpp"
+#include "message.hpp"
 
 #include <boost/asio.hpp>
 
@@ -22,7 +23,7 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
     struct listener
     {
         virtual void on_close(pointer connection) {}
-        virtual void on_received(pointer connection, std::string message) {}
+        virtual void on_received(pointer connection, message message) {}
         virtual void on_error(pointer connection, boost::system::error_code) {}
     };
 
@@ -58,7 +59,7 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
      */
     void close();
 
-    void send(std::string message);
+    void send(message message);
 
   private:
     friend pointer make_control_connection(protocol::socket &&socket);

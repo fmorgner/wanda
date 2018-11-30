@@ -2,6 +2,7 @@
 #define WANDA_COMMANDER_HPP
 
 #include "control_connection.hpp"
+#include "message.hpp"
 
 #include <boost/system/error_code.hpp>
 
@@ -16,7 +17,7 @@ struct commander : wanda::control_connection::listener
   commander(boost::asio::io_service &service, std::filesystem::path socket);
 
   void start();
-  void send(std::string message);
+  void send(message message);
 
   void on_error(wanda::control_connection::pointer connection, boost::system::error_code error) override;
 
