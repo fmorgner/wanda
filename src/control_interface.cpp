@@ -2,6 +2,8 @@
 
 #include <boost/system/error_code.hpp>
 
+#include <spdlog/fmt/ostr.h>
+
 #include <unistd.h>
 
 #include <algorithm>
@@ -24,12 +26,13 @@ socket_deleter::~socket_deleter()
 
 // 'control_interface' implementation
 
-control_interface::control_interface(control_interface::key key, boost::asio::io_service &service, control_interface::protocol::endpoint endpoint)
+control_interface::control_interface(control_interface::key key, boost::asio::io_service &service, control_interface::protocol::endpoint endpoint, std::shared_ptr<spdlog::logger> logger)
     : keyed{key},
       m_service{service},
       m_endpoint{std::move(endpoint)},
       m_socket{m_service},
-      m_acceptor{m_service}
+      m_acceptor{m_service},
+      m_logger{logger}
 {
 }
 
@@ -72,10 +75,11 @@ void control_interface::perform_accept()
     m_acceptor.async_accept(m_socket, [that = shared_from_this(), this](auto const &error) {
         if (error && error != boost::asio::error::operation_aborted)
         {
-            // TODO: Handle error
+            m_logger->error("failed to accept connection because '{}'", error);
         }
         else
         {
+            m_logger->info("new incoming controller connection");
             auto [connection, inserted] = m_connections.insert(make_control_connection(std::move(m_socket)));
             if (inserted)
             {
@@ -89,6 +93,14 @@ void control_interface::perform_accept()
 
 void control_interface::on_close(control_connection::pointer connection)
 {
+    if (static_cast<char>(connection->current_state()) >= static_cast<char>(control_connection::state::established))
+    {
+        m_logger->info("controller connection closed");
+    }
+    else
+    {
+        m_logger->info("controller connection aborted before it could be established");
+    }
     m_connections.erase(connection);
 }
 
@@ -96,36 +108,42 @@ void control_interface::on_received(control_connection::pointer connection, mess
 {
     if (m_connections.find(connection) == m_connections.cend())
     {
-        // TODO: Handle unknown connection
+        m_logger->error("received message from an unknown connection");
         return;
     }
 
     if (message.source != message_source_controller)
     {
-        // TODO: Handle illegal message source
+        m_logger->error("received a deamon message");
         return;
     }
 
     if (auto state = connection->current_state(); message.command == message_command_hello && state == control_connection::state::fresh)
     {
+        m_logger->info("controller connection established");
+        if (message.argument.has_value())
+        {
+            m_logger->info("remote controller version '{}'", *message.argument);
+        }
         connection->send({message_source_daemon, message_command_hello, message_argument_hello});
         connection->update(control_connection::state::established);
     }
     else
     {
-        // TODO: Handle unexpected message
+        m_logger->warn("ignoring unknown message '{}'", message);
     }
 }
 
-control_interface::pointer make_interface(boost::asio::io_service &service, std::filesystem::path file)
+control_interface::pointer make_interface(boost::asio::io_service &service, std::filesystem::path file, std::shared_ptr<spdlog::logger> logger)
 {
     if (std::filesystem::exists(file))
     {
+        logger->error("file '{}' exists", file.native());
         return {};
     }
 
     control_interface::protocol::endpoint endpoint{file.string()};
-    return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint));
+    return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint), logger);
 }
 
 } // namespace wanda

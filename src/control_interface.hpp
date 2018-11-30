@@ -7,6 +7,8 @@
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 
+#include <spdlog/spdlog.h>
+
 #include <cstddef>
 #include <filesystem>
 #include <istream>
@@ -31,7 +33,7 @@ struct control_interface : control_connection::listener, keyed<control_interface
     using protocol = boost::asio::local::stream_protocol;
     using pointer = std::shared_ptr<control_interface>;
 
-    control_interface(key, boost::asio::io_service &service, protocol::endpoint endpoint);
+    control_interface(key, boost::asio::io_service &service, protocol::endpoint endpoint, std::shared_ptr<spdlog::logger> logger);
 
     boost::system::error_code start();
     boost::system::error_code shutdown();
@@ -42,7 +44,7 @@ struct control_interface : control_connection::listener, keyed<control_interface
   private:
     void perform_accept();
 
-    friend pointer make_interface(boost::asio::io_service &service, std::filesystem::path file);
+    friend pointer make_interface(boost::asio::io_service &service, std::filesystem::path file, std::shared_ptr<spdlog::logger> logger);
 
     boost::asio::io_service &m_service;
     protocol::endpoint m_endpoint;
@@ -50,9 +52,10 @@ struct control_interface : control_connection::listener, keyed<control_interface
     protocol::acceptor m_acceptor;
     socket_deleter m_deleter{m_endpoint.path()};
     std::set<control_connection::pointer> m_connections;
+    std::shared_ptr<spdlog::logger> m_logger;
 };
 
-control_interface::pointer make_interface(boost::asio::io_service &service, std::filesystem::path file);
+control_interface::pointer make_interface(boost::asio::io_service &service, std::filesystem::path file, std::shared_ptr<spdlog::logger> logger);
 
 } // namespace wanda
 

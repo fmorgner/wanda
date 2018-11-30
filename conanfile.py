@@ -26,6 +26,7 @@ class Wanda(ConanFile):
         "boost_program_options/1.67.0@bincrafters/stable",
         "boost_iterator/1.67.0@bincrafters/stable",
         "boost_asio/1.67.0@bincrafters/stable",
+        "spdlog/1.2.1@bincrafters/stable",
     )
 
     def build(self):

@@ -8,6 +8,9 @@
 
 #include <boost/asio.hpp>
 
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 #include <csignal>
 #include <iostream>
 #include <set>
@@ -36,20 +39,22 @@ int main()
 {
   using namespace wanda::std_ext;
 
-  with(wanda::scan({"/usr/share/backgrounds"}, image_filter), [](auto const &list) {
+  auto log = spdlog::stdout_color_mt("wandad");
+  log->info("wanda is starting up");
+
+  with(wanda::scan({"/usr/share/backgrounds"}, image_filter), [&](auto const &list) {
     auto wallpaper = wanda::random_pick(list);
     wanda::set_wallpaper(wallpaper);
 
     auto service = boost::asio::io_service{};
     auto socket_path = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, wanda::environment{}) / ".wanda_interface";
 
-    std::clog << "[wandad::main] Initializing control interface on socket '" << socket_path.native() << "'\n";
-    auto interface = wanda::make_interface(service, socket_path);
+    log->info("starting control interface on '{}'", socket_path.native());
+    auto interface = wanda::make_interface(service, socket_path, log);
 
     if(!interface)
     {
-      std::cerr << "[wandad::main] Failed to initialize control interface on socket '" << socket_path.native() << "'\n"
-                << "[wandad::main] File already existed. Is 'wandad' running already?\n";
+      log->error("failed to start control interface");
       return;
     }
 
@@ -68,5 +73,5 @@ int main()
     });
 
     service.run();
-  }) || [] { std::cerr << "Directory does not exist\n"; };
+  }) || [&] { log->error("wallpaper directory does not exist"); };
 }
