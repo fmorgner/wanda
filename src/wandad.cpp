@@ -45,9 +45,15 @@ int main()
 
     std::clog << "[wandad::main] Initializing control interface on socket '" << socket_path.native() << "'\n";
     auto interface = wanda::make_interface(service, socket_path);
-    auto status = interface->start();
 
-    if (status)
+    if(!interface)
+    {
+      std::cerr << "[wandad::main] Failed to initialize control interface on socket '" << socket_path.native() << "'\n"
+                << "[wandad::main] File already existed. Is 'wandad' running already?\n";
+      return;
+    }
+
+    if (interface->start())
     {
       return;
     }

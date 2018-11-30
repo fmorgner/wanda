@@ -121,8 +121,9 @@ control_interface::pointer make_interface(boost::asio::io_service &service, std:
 {
     if (std::filesystem::exists(file))
     {
-        std::filesystem::remove(file);
+        return {};
     }
+
     control_interface::protocol::endpoint endpoint{file.string()};
     return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint));
 }
