@@ -4,6 +4,8 @@
 #include <ios>
 #include <sstream>
 
+#include <iostream>
+
 namespace wanda
 {
 
@@ -64,6 +66,7 @@ std::istream &operator>>(std::istream &in, message &message)
        message.argument = std::optional{std::move(buffer)};
     }
 
+    in.clear(in.rdstate() ^ std::ios_base::failbit);
     return in;
 }
 

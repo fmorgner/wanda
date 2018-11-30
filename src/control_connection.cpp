@@ -17,13 +17,13 @@ control_connection::control_connection(control_connection::key key, control_conn
 {
 }
 
-bool control_connection::add(std::shared_ptr<control_connection::listener> listener)
+bool control_connection::add(listener * listener)
 {
     auto [_, inserted] = m_listeners.insert(listener);
     return inserted;
 }
 
-bool control_connection::remove(std::shared_ptr<control_connection::listener> listener)
+bool control_connection::remove(listener * listener)
 {
     return m_listeners.erase(listener);
 }
@@ -92,9 +92,9 @@ void control_connection::perform_read()
         {
             auto msg = message{};
             m_input >> msg;
-            m_input.ignore(std::numeric_limits<std::streamsize>::max());
             if (!m_input)
             {
+                m_input.ignore(std::numeric_limits<std::streamsize>::max());
                 m_input.clear();
             }
             else

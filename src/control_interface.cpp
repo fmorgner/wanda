@@ -58,7 +58,7 @@ boost::system::error_code control_interface::start()
 
 boost::system::error_code control_interface::shutdown()
 {
-    for(auto & connection : m_connections)
+    for (auto &connection : m_connections)
     {
         connection->close();
     }
@@ -77,9 +77,10 @@ void control_interface::perform_accept()
         else
         {
             auto [connection, inserted] = m_connections.insert(make_control_connection(std::move(m_socket)));
-            if(inserted)
+            if (inserted)
             {
-                (*connection)->add(shared_from_this());
+                m_states[*connection] = state::fresh;
+                (*connection)->add(this);
                 (*connection)->start();
             }
             perform_accept();
@@ -90,6 +91,25 @@ void control_interface::perform_accept()
 void control_interface::on_close(control_connection::pointer connection)
 {
     m_connections.erase(connection);
+}
+
+void control_interface::on_received(control_connection::pointer connection, message message)
+{
+    if (m_states.find(connection) == m_states.cend())
+    {
+        // TODO: Handle unknown connection
+        return;
+    }
+
+    switch (m_states[connection])
+    {
+    case state::fresh:
+        if (message.command == "HELLO")
+        {
+            m_states[connection] = state::greeted;
+            connection->send({"D", "HELLO", "1.0.0"});
+        }
+    }
 }
 
 control_interface::pointer make_interface(boost::asio::io_service &service, std::filesystem::path file)

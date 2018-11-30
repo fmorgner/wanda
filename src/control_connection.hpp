@@ -40,14 +40,14 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
      * 
      * @returns <code>true</code> iff. the listener was not already in the listener set
      */
-    bool add(std::shared_ptr<listener> listener);
+    bool add(listener * listener);
 
     /**
      * @brief Remove the given listener from this control connection's listener set
      * 
      * @return <code>true</code> iff. the listener was previously registered with this control connection
      */
-    bool remove(std::shared_ptr<listener> listener);
+    bool remove(listener * listener);
 
     /**
      * @brief Start I/O processing for this control connection
@@ -71,7 +71,7 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
     boost::asio::streambuf m_out{};
     std::istream m_input{&m_in};
     std::ostream m_output{&m_out};
-    std::set<std::shared_ptr<listener>> m_listeners{};
+    std::set<listener *> m_listeners{};
     bool m_running{};
 };
 
