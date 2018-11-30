@@ -1,4 +1,6 @@
 #include "control_connection.hpp"
+#include "environment.hpp"
+#include "xdg.hpp"
 
 #include <boost/asio.hpp>
 
@@ -18,6 +20,7 @@ struct commander : wanda::control_connection::listener, std::enable_shared_from_
 
     void start()
     {
+        std::clog << "[commander::start] Starting commander on socket '" << m_endpoint.path() << "'\n";
         m_socket.async_connect(m_endpoint, [&](auto const &error) {
             if (error)
             {
@@ -25,6 +28,7 @@ struct commander : wanda::control_connection::listener, std::enable_shared_from_
             }
             else
             {
+                std::clog << "[commander::start] Control connection established\n";
                 m_connection = wanda::make_control_connection(std::move(m_socket));
                 m_connection->start();
                 send("C:HELLO:1.0.0\n");
@@ -56,8 +60,12 @@ struct commander : wanda::control_connection::listener, std::enable_shared_from_
 
 int main()
 {
+    auto environment = wanda::environment{};
+    auto interface = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, environment) / ".wanda_interface";
     auto service = boost::asio::io_service{};
-    auto command_processor = commander{service, std::filesystem::path{".wanda_interface"}};
+
+    std::clog << "[wandac::main] Initializing commander for socket '" << interface.native() << "'\n";    
+    auto command_processor = commander{service, interface};
 
     command_processor.start();
 

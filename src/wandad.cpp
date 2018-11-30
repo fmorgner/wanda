@@ -1,8 +1,10 @@
 #include "control_interface.hpp"
+#include "environment.hpp"
 #include "filesystem.hpp"
 #include "optional.hpp"
 #include "setting.hpp"
 #include "wallpaper.hpp"
+#include "xdg.hpp"
 
 #include <boost/asio.hpp>
 
@@ -39,7 +41,10 @@ int main()
     wanda::set_wallpaper(wallpaper);
 
     auto service = boost::asio::io_service{};
-    auto interface = wanda::make_interface(service, ".wanda_interface");
+    auto socket_path = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, wanda::environment{}) / ".wanda_interface";
+
+    std::clog << "[wandad::main] Initializing control interface on socket '" << socket_path.native() << "'\n";
+    auto interface = wanda::make_interface(service, socket_path);
     auto status = interface->start();
 
     if (status)

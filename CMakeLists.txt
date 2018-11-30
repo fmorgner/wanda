@@ -24,14 +24,19 @@ add_library("core" OBJECT
   "src/control_connection.hpp"
   "src/control_interface.cpp"
   "src/control_interface.hpp"
+  "src/environment.cpp"
+  "src/environment.hpp"
   "src/deferred_failure.hpp"
   "src/keyed.hpp"
   "src/optional.hpp"
   "src/type_wrapper.hpp"
+  "src/xdg.cpp"
+  "src/xdg.hpp"
 )
 
 target_link_libraries("core"
   "CONAN_PKG::boost_asio"
+  "CONAN_PKG::boost_program_options"
   "SYSTEM::C++FS"
   "Threads::Threads"
 )
@@ -48,7 +53,6 @@ add_executable("wandad"
 
 target_link_libraries("wandad"
   "core"
-  "CONAN_PKG::boost_program_options"
   "SYSTEM::GIO"
   )
 
