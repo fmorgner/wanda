@@ -57,6 +57,8 @@ target_link_libraries("wandad"
   )
 
 add_executable("wandac"
+  "src/commander.cpp"
+  "src/commander.hpp"
   "src/wandac.cpp"
 )
 
