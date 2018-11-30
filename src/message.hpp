@@ -9,6 +9,16 @@
 namespace wanda
 {
 
+inline namespace v1
+{
+auto constexpr message_argument_hello = "1.0.0";
+}
+
+auto constexpr message_source_controller = "C";
+auto constexpr message_source_daemon = "D";
+
+auto constexpr message_command_hello = "HELLO";
+
 struct message
 {
     explicit operator std::string() const;
@@ -20,8 +30,8 @@ struct message
     std::optional<std::string> argument;
 };
 
-std::istream & operator>>(std::istream & in, message & message);
-std::ostream & operator<<(std::ostream & out, message const & message);
+std::istream &operator>>(std::istream &in, message &message);
+std::ostream &operator<<(std::ostream &out, message const &message);
 
 } // namespace wanda
 

@@ -25,7 +25,7 @@ void commander::start()
             m_connection = wanda::make_control_connection(std::move(m_socket));
             m_connection->add(this);
             m_connection->start();
-            m_connection->send({"C", "HELLO", "1.0.0"});
+            m_connection->send({message_source_controller, message_command_hello, message_argument_hello});
         }
     });
 }

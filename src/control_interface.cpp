@@ -100,14 +100,20 @@ void control_interface::on_received(control_connection::pointer connection, mess
         return;
     }
 
-    switch (connection->current_state())
+    if (message.source != message_source_controller)
     {
-    case control_connection::state::fresh:
-        if (message.command == "HELLO")
-        {
-            connection->send({"D", "HELLO", "1.0.0"});
-            connection->update(control_connection::state::established);
-        }
+        // TODO: Handle illegal message source
+        return;
+    }
+
+    if (auto state = connection->current_state(); message.command == message_command_hello && state == control_connection::state::fresh)
+    {
+        connection->send({message_source_daemon, message_command_hello, message_argument_hello});
+        connection->update(control_connection::state::established);
+    }
+    else
+    {
+        // TODO: Handle unexpected message
     }
 }
 
