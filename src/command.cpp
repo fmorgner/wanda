@@ -30,4 +30,14 @@ std::optional<message> command::message() const
     return wanda::message{"C", command, argument_string};
 }
 
+std::optional<command> make_command(message message)
+{
+    if(message.command == "CHANGE")
+    {
+        return {{command_id::change}};
+    }
+
+    return std::nullopt;
+}
+
 } // namespace wanda

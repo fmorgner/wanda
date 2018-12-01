@@ -1,6 +1,7 @@
 #ifndef WANDA_CONTROL_INTERFACE_HPP
 #define WANDA_CONTROL_INTERFACE_HPP
 
+#include "command.hpp"
 #include "control_connection.hpp"
 #include "keyed.hpp"
 
@@ -32,7 +33,12 @@ struct control_interface : control_connection::listener, keyed<control_interface
     using protocol = asio::local::stream_protocol;
     using pointer = std::shared_ptr<control_interface>;
 
-    control_interface(key, asio::io_service &service, protocol::endpoint endpoint, std::shared_ptr<spdlog::logger> logger);
+    struct listener 
+    {
+        virtual void on_received(control_interface & interface, command command) { };
+    };
+
+    control_interface(key, asio::io_service &service, protocol::endpoint endpoint, listener & listener, std::shared_ptr<spdlog::logger> logger);
 
     std::error_code start();
     std::error_code shutdown();
@@ -43,18 +49,19 @@ struct control_interface : control_connection::listener, keyed<control_interface
   private:
     void perform_accept();
 
-    friend pointer make_interface(asio::io_service &service, std::filesystem::path file, std::shared_ptr<spdlog::logger> logger);
+    friend pointer make_interface(asio::io_service &service, std::filesystem::path file, control_interface::listener & listener, std::shared_ptr<spdlog::logger> logger);
 
     asio::io_service &m_service;
     protocol::endpoint m_endpoint;
     protocol::socket m_socket;
     protocol::acceptor m_acceptor;
+    listener & m_listener;
     socket_deleter m_deleter{m_endpoint.path()};
     std::set<control_connection::pointer> m_connections;
     std::shared_ptr<spdlog::logger> m_logger;
 };
 
-control_interface::pointer make_interface(asio::io_service &service, std::filesystem::path file, std::shared_ptr<spdlog::logger> logger);
+control_interface::pointer make_interface(asio::io_service &service, std::filesystem::path file, control_interface::listener & listener, std::shared_ptr<spdlog::logger> logger);
 
 } // namespace wanda
 

@@ -29,6 +29,7 @@ struct commander : wanda::control_connection::listener
   commander(asio::io_service &service, std::filesystem::path socket, listener & listener, std::shared_ptr<spdlog::logger> logger);
 
   void start();
+  void stop();
   void send(command command);
 
   void on_error(control_connection::pointer connection, std::error_code error) override;

@@ -34,6 +34,12 @@ void commander::start()
     });
 }
 
+void commander::stop()
+{
+    m_logger->info("closing control connection");
+    m_connection->close();
+}
+
 void commander::send(command command)
 {
     using namespace wanda::std_ext;

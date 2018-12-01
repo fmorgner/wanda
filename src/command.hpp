@@ -21,6 +21,9 @@ struct command
 
     std::optional<wanda::message> message() const;
 };
+
+std::optional<command> make_command(message message);
+
 } // namespace wanda
 
 #endif

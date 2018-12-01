@@ -1,4 +1,5 @@
 #include "control_interface.hpp"
+#include "optional.hpp"
 
 #include <spdlog/fmt/ostr.h>
 
@@ -25,12 +26,13 @@ socket_deleter::~socket_deleter()
 
 // 'control_interface' implementation
 
-control_interface::control_interface(control_interface::key key, asio::io_service &service, control_interface::protocol::endpoint endpoint, std::shared_ptr<spdlog::logger> logger)
+control_interface::control_interface(control_interface::key key, asio::io_service &service, control_interface::protocol::endpoint endpoint, listener & listener, std::shared_ptr<spdlog::logger> logger)
     : keyed{key},
       m_service{service},
       m_endpoint{std::move(endpoint)},
       m_socket{m_service},
       m_acceptor{m_service},
+      m_listener{listener},
       m_logger{logger}
 {
 }
@@ -105,6 +107,8 @@ void control_interface::on_close(control_connection::pointer connection)
 
 void control_interface::on_received(control_connection::pointer connection, message message)
 {
+    using namespace wanda::std_ext;
+
     if (m_connections.find(connection) == m_connections.cend())
     {
         m_logger->error("received message from an unknown connection");
@@ -129,11 +133,13 @@ void control_interface::on_received(control_connection::pointer connection, mess
     }
     else
     {
-        m_logger->warn("ignoring unknown message '{}'", message);
+        with(make_command(message), [&](auto const & command){
+            m_listener.on_received(*this, command);
+        }) || [&] { m_logger->warn("ignoring unknown message '{}'", message); };
     }
 }
 
-control_interface::pointer make_interface(asio::io_service &service, std::filesystem::path file, std::shared_ptr<spdlog::logger> logger)
+control_interface::pointer make_interface(asio::io_service &service, std::filesystem::path file, control_interface::listener & listener, std::shared_ptr<spdlog::logger> logger)
 {
     if (std::filesystem::exists(file))
     {
@@ -142,7 +148,7 @@ control_interface::pointer make_interface(asio::io_service &service, std::filesy
     }
 
     control_interface::protocol::endpoint endpoint{file.string()};
-    return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint), logger);
+    return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint), listener, logger);
 }
 
 } // namespace wanda
