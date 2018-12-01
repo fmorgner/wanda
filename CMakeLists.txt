@@ -22,6 +22,7 @@ include("SystemDependencies")
 ##### Wanda CORE #####
 
 set(WANDA_CORE_SOURCES
+  "src/command.cpp"
   "src/control_connection.cpp"
   "src/environment.cpp"
   "src/message.cpp"
@@ -29,6 +30,7 @@ set(WANDA_CORE_SOURCES
 )
 
 set(WANDA_CORE_HEADERS
+  "src/command.hpp"
   "src/control_connection.hpp"
   "src/deferred_failure.hpp"
   "src/environment.hpp"

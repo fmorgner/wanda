@@ -1,3 +1,4 @@
+#include "command.hpp"
 #include "commander.hpp"
 #include "environment.hpp"
 #include "xdg.hpp"
@@ -59,7 +60,7 @@ struct listener : wanda::commander::listener
     {
         if (m_cli.command == "change")
         {
-            commander.send({wanda::commander::command_id::change});
+            commander.send({wanda::command_id::change});
         }
     }
 

@@ -1,6 +1,7 @@
 #ifndef WANDA_COMMANDER_HPP
 #define WANDA_COMMANDER_HPP
 
+#include "command.hpp"
 #include "control_connection.hpp"
 #include "message.hpp"
 
@@ -18,19 +19,6 @@ namespace wanda
 
 struct commander : wanda::control_connection::listener
 {
-  enum struct command_id : char
-  {
-    change,
-  };
-
-  struct command
-  {
-    command_id const id;
-    std::vector<std::string> const arguments;
-
-    std::optional<wanda::message> message() const;
-  };
-
   struct listener
   {
     virtual void on_connected(commander & commander) { };
