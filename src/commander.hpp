@@ -9,16 +9,39 @@
 
 #include <filesystem>
 #include <memory>
+#include <optional>
 #include <string>
+#include <vector>
 
 namespace wanda
 {
 
 struct commander : wanda::control_connection::listener
 {
-  commander(asio::io_service &service, std::filesystem::path socket, std::shared_ptr<spdlog::logger> logger);
+  enum struct command_id : char
+  {
+    change,
+  };
+
+  struct command
+  {
+    command_id const id;
+    std::vector<std::string> const arguments;
+
+    std::optional<wanda::message> message() const;
+  };
+
+  struct listener
+  {
+    virtual void on_connected(commander & commander) { };
+    virtual void on_response(commander & commander, std::string response) { };
+    virtual void on_error(commander & commander, std::string error) { };
+  };
+
+  commander(asio::io_service &service, std::filesystem::path socket, listener & listener, std::shared_ptr<spdlog::logger> logger);
 
   void start();
+  void send(command command);
 
   void on_error(control_connection::pointer connection, std::error_code error) override;
   void on_received(control_connection::pointer connection, message message) override;
@@ -28,6 +51,7 @@ private:
   wanda::control_connection::protocol::endpoint m_endpoint;
   wanda::control_connection::protocol::socket m_socket;
   wanda::control_connection::pointer m_connection;
+  listener & m_listener;
   std::shared_ptr<spdlog::logger> m_logger;
 };
 
