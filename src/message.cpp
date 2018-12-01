@@ -4,8 +4,6 @@
 #include <ios>
 #include <sstream>
 
-#include <iostream>
-
 namespace wanda
 {
 

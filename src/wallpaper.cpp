@@ -2,12 +2,10 @@
 #include "setting.hpp"
 #include "wallpaper.hpp"
 
-#include <iostream>
-
 namespace wanda
 {
 
-void set_wallpaper(std::filesystem::path wallpaper)
+void set_wallpaper(std::filesystem::path wallpaper, std::shared_ptr<spdlog::logger> logger)
 {
     using namespace wanda::literals;
     using namespace wanda::std_ext;
@@ -16,8 +14,8 @@ void set_wallpaper(std::filesystem::path wallpaper)
     with("org.gnome.desktop.background"_setting, [&](auto &setting) {
         with(setting["picture-uri"_key], [&](auto &value) {
             value = "file://" + wallpaper.native();
-        }) || [] { std::cerr << "No such key!\n"; };
-    }) || [] { std::cerr << "No such setting!\n"; };
+        }) || [&] { logger->error("invalid settings key"); };
+    }) || [&] { logger->error("invalid setting"); };
 }
 
 } // namespace wanda

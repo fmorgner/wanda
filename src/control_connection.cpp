@@ -1,6 +1,5 @@
 #include "control_connection.hpp"
 
-#include <iostream>
 #include <limits>
 
 namespace wanda

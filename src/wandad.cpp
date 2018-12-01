@@ -12,7 +12,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <csignal>
-#include <iostream>
 #include <set>
 #include <string>
 

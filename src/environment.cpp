@@ -1,6 +1,5 @@
 #include "environment.hpp"
 
-#include <iostream>
 #include <string>
 
 namespace wanda

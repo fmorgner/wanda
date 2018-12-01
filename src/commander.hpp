@@ -5,8 +5,10 @@
 #include "message.hpp"
 
 #include <asio.hpp>
+#include <spdlog/logger.h>
 
 #include <filesystem>
+#include <memory>
 #include <string>
 
 namespace wanda
@@ -14,7 +16,7 @@ namespace wanda
 
 struct commander : wanda::control_connection::listener
 {
-  commander(asio::io_service &service, std::filesystem::path socket);
+  commander(asio::io_service &service, std::filesystem::path socket, std::shared_ptr<spdlog::logger> logger);
 
   void start();
 
@@ -26,6 +28,7 @@ private:
   wanda::control_connection::protocol::endpoint m_endpoint;
   wanda::control_connection::protocol::socket m_socket;
   wanda::control_connection::pointer m_connection;
+  std::shared_ptr<spdlog::logger> m_logger;
 };
 
 } // namespace wanda
