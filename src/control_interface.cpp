@@ -1,7 +1,5 @@
 #include "control_interface.hpp"
 
-#include <boost/system/error_code.hpp>
-
 #include <spdlog/fmt/ostr.h>
 
 #include <unistd.h>
@@ -9,6 +7,7 @@
 #include <algorithm>
 #include <iterator>
 #include <string>
+#include <system_error>
 #include <utility>
 
 namespace wanda
@@ -26,7 +25,7 @@ socket_deleter::~socket_deleter()
 
 // 'control_interface' implementation
 
-control_interface::control_interface(control_interface::key key, boost::asio::io_service &service, control_interface::protocol::endpoint endpoint, std::shared_ptr<spdlog::logger> logger)
+control_interface::control_interface(control_interface::key key, asio::io_service &service, control_interface::protocol::endpoint endpoint, std::shared_ptr<spdlog::logger> logger)
     : keyed{key},
       m_service{service},
       m_endpoint{std::move(endpoint)},
@@ -36,19 +35,19 @@ control_interface::control_interface(control_interface::key key, boost::asio::io
 {
 }
 
-boost::system::error_code control_interface::start()
+std::error_code control_interface::start()
 {
-    if (auto error = boost::system::error_code{}; m_acceptor.open(m_endpoint.protocol(), error))
+    if (auto error = std::error_code{}; m_acceptor.open(m_endpoint.protocol(), error))
     {
         return error;
     }
 
-    if (auto error = boost::system::error_code{}; m_acceptor.bind(m_endpoint, error))
+    if (auto error = std::error_code{}; m_acceptor.bind(m_endpoint, error))
     {
         return error;
     }
 
-    if (auto error = boost::system::error_code{}; m_acceptor.listen(128, error))
+    if (auto error = std::error_code{}; m_acceptor.listen(128, error))
     {
         return error;
     }
@@ -59,21 +58,21 @@ boost::system::error_code control_interface::start()
     }
 }
 
-boost::system::error_code control_interface::shutdown()
+std::error_code control_interface::shutdown()
 {
     for (auto &connection : m_connections)
     {
         connection->close();
     }
 
-    auto error = boost::system::error_code{};
+    auto error = std::error_code{};
     return m_acceptor.close(error);
 }
 
 void control_interface::perform_accept()
 {
     m_acceptor.async_accept(m_socket, [that = shared_from_this(), this](auto const &error) {
-        if (error && error != boost::asio::error::operation_aborted)
+        if (error && error != asio::error::operation_aborted)
         {
             m_logger->error("failed to accept connection because '{}'", error);
         }
@@ -134,7 +133,7 @@ void control_interface::on_received(control_connection::pointer connection, mess
     }
 }
 
-control_interface::pointer make_interface(boost::asio::io_service &service, std::filesystem::path file, std::shared_ptr<spdlog::logger> logger)
+control_interface::pointer make_interface(asio::io_service &service, std::filesystem::path file, std::shared_ptr<spdlog::logger> logger)
 {
     if (std::filesystem::exists(file))
     {

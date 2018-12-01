@@ -6,7 +6,7 @@
 #include "wallpaper.hpp"
 #include "xdg.hpp"
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -46,7 +46,7 @@ int main()
     auto wallpaper = wanda::random_pick(list);
     wanda::set_wallpaper(wallpaper);
 
-    auto service = boost::asio::io_service{};
+    auto service = asio::io_service{};
     auto socket_path = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, wanda::environment{}) / ".wanda_interface";
 
     log->info("starting control interface on '{}'", socket_path.native());
@@ -63,7 +63,7 @@ int main()
       return;
     }
 
-    auto signals = boost::asio::signal_set{service, SIGINT};
+    auto signals = asio::signal_set{service, SIGINT};
     signals.async_wait([&](auto const &error, auto const signal) {
       if (!error && signal == SIGINT)
       {

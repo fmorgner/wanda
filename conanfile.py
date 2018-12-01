@@ -23,11 +23,15 @@ class Wanda(ConanFile):
         "src/*",
     )
     requires = (
-        "boost_program_options/1.67.0@bincrafters/stable",
+        "asio/1.12.0@bincrafters/stable",
         "boost_iterator/1.67.0@bincrafters/stable",
-        "boost_asio/1.67.0@bincrafters/stable",
+        "clara/1.1.5@bincrafters/stable",
         "spdlog/1.2.1@bincrafters/stable",
     )
+    default_options = {
+        "asio:standalone": True,
+        "spdlog:fmt_external": False,
+    }
 
     def build(self):
         cmake = CMake(self)

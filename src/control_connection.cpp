@@ -40,7 +40,7 @@ void control_connection::start()
 void control_connection::send(message message)
 {
     m_output << message << '\n';
-    boost::asio::async_write(m_socket, m_out, boost::asio::transfer_exactly(message.size() + 1), [that = shared_from_this(), this](auto const &error, auto const length) {
+    asio::async_write(m_socket, m_out, asio::transfer_exactly(message.size() + 1), [that = shared_from_this(), this](auto const &error, auto const length) {
         if (error)
         {
             // TODO: Handle error
@@ -54,7 +54,7 @@ void control_connection::send(message message)
 
 void control_connection::close()
 {
-    if (auto error = boost::system::error_code{}; m_socket.cancel(error))
+    if (auto error = std::error_code{}; m_socket.cancel(error))
     {
         for (auto &listener : m_listeners)
         {
@@ -62,7 +62,7 @@ void control_connection::close()
         }
     }
 
-    if (auto error = boost::system::error_code{}; m_socket.close(error))
+    if (auto error = std::error_code{}; m_socket.close(error))
     {
         for (auto &listener : m_listeners)
         {
@@ -89,7 +89,7 @@ control_connection::state control_connection::current_state() const
 
 void control_connection::perform_read()
 {
-    boost::asio::async_read_until(m_socket, m_in, '\n', [that = shared_from_this(), this](auto const &error, auto const length) {
+    asio::async_read_until(m_socket, m_in, '\n', [that = shared_from_this(), this](auto const &error, auto const length) {
         if (error)
         {
             for (auto &listener : m_listeners)

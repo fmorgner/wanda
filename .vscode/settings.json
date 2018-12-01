@@ -59,6 +59,9 @@
         "typeindex": "cpp",
         "typeinfo": "cpp",
         "__config": "cpp",
-        "__nullptr": "cpp"
+        "__nullptr": "cpp",
+        "hash_map": "cpp",
+        "strstream": "cpp",
+        "algorithm": "cpp"
     }
 }

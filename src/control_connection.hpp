@@ -4,27 +4,28 @@
 #include "keyed.hpp"
 #include "message.hpp"
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 
 #include <istream>
 #include <memory>
 #include <ostream>
 #include <set>
 #include <string>
+#include <system_error>
 
 namespace wanda
 {
 
 struct control_connection : keyed<control_connection>, std::enable_shared_from_this<control_connection>
 {
-    using protocol = boost::asio::local::stream_protocol;
+    using protocol = asio::local::stream_protocol;
     using pointer = std::shared_ptr<control_connection>;
 
     struct listener
     {
         virtual void on_close(pointer connection) {}
         virtual void on_received(pointer connection, message message) {}
-        virtual void on_error(pointer connection, boost::system::error_code) {}
+        virtual void on_error(pointer connection, std::error_code) {}
     };
 
     enum struct state : std::underlying_type_t<std::byte>
@@ -78,8 +79,8 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
     void perform_read();
 
     protocol::socket m_socket;
-    boost::asio::streambuf m_in{};
-    boost::asio::streambuf m_out{};
+    asio::streambuf m_in{};
+    asio::streambuf m_out{};
     std::istream m_input{&m_in};
     std::ostream m_output{&m_out};
     std::set<listener *> m_listeners{};

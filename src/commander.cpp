@@ -5,7 +5,7 @@
 
 namespace wanda
 {
-commander::commander(boost::asio::io_service &service, std::filesystem::path socket)
+commander::commander(asio::io_service &service, std::filesystem::path socket)
     : m_service{service},
       m_endpoint{socket.string()},
       m_socket{service}
@@ -30,7 +30,7 @@ void commander::start()
     });
 }
 
-void commander::on_error(wanda::control_connection::pointer connection, boost::system::error_code error)
+void commander::on_error(control_connection::pointer connection, std::error_code error)
 {
     std::cerr << "[commander::on_error] error occured: " << error.message() << '\n';
 }

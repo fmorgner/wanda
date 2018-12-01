@@ -40,8 +40,7 @@ set(WANDA_CORE_HEADERS
 )
 
 set(WANDA_CORE_LIBRARIES
-  "CONAN_PKG::boost_asio"
-  "CONAN_PKG::boost_program_options"
+  "CONAN_PKG::asio"
   "CONAN_PKG::spdlog"
   "SYSTEM::C++FS"
   "Threads::Threads"
