@@ -48,7 +48,7 @@ set(WANDA_CORE_LIBRARIES
   "Threads::Threads"
 )
 
-add_library("core" OBJECT ${WANDA_CORE_SOURCES} ${WANDA_CORE_HEADERS})
+add_library("core" ${WANDA_CORE_SOURCES} ${WANDA_CORE_HEADERS})
 target_link_libraries("core" ${WANDA_CORE_LIBRARIES})
 
 ##### Wanda Daemon #####
