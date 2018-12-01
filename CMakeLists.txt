@@ -68,6 +68,7 @@ set(WANDA_DAEMON_HEADERS
 
 set(WANDA_DAEMON_LIBRARIES
   "core"
+  "CONAN_PKG::clara"
   "SYSTEM::GIO"
 )
 
@@ -86,6 +87,7 @@ set(WANDA_CONTROLLER_HEADERS
 )
 
 set(WANDA_CONTROLLER_LIBRARIES
+  "CONAN_PKG::clara"
   "core"
 )
 
