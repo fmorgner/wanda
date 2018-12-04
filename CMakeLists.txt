@@ -48,10 +48,10 @@ set(WANDA_CORE_LIBRARIES
   "Threads::Threads"
 )
 
-add_library("core" ${WANDA_CORE_SOURCES} ${WANDA_CORE_HEADERS})
-target_link_libraries("core" ${WANDA_CORE_LIBRARIES})
-set_target_properties("core" PROPERTIES PUBLIC_HEADER "${WANDA_CORE_HEADERS}")
-install(TARGETS "core" ARCHIVE DESTINATION "lib" PUBLIC_HEADER DESTINATION "include")
+add_library("wanda" ${WANDA_CORE_SOURCES} ${WANDA_CORE_HEADERS})
+target_link_libraries("wanda" ${WANDA_CORE_LIBRARIES})
+set_target_properties("wanda" PROPERTIES PUBLIC_HEADER "${WANDA_CORE_HEADERS}")
+install(TARGETS "wanda" ARCHIVE DESTINATION "lib" PUBLIC_HEADER DESTINATION "include")
 
 ##### Wanda Daemon #####
 
@@ -71,7 +71,7 @@ set(WANDA_DAEMON_HEADERS
 )
 
 set(WANDA_DAEMON_LIBRARIES
-  "core"
+  "wanda"
   "CONAN_PKG::clara"
   "SYSTEM::GIO"
 )
@@ -92,8 +92,8 @@ set(WANDA_CONTROLLER_HEADERS
 )
 
 set(WANDA_CONTROLLER_LIBRARIES
+  "wanda"
   "CONAN_PKG::clara"
-  "core"
 )
 
 add_executable("wandac" ${WANDA_CONTROLLER_SOURCES} ${WANDA_CONTROLLER_HEADERS})
