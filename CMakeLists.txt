@@ -50,6 +50,8 @@ set(WANDA_CORE_LIBRARIES
 
 add_library("core" ${WANDA_CORE_SOURCES} ${WANDA_CORE_HEADERS})
 target_link_libraries("core" ${WANDA_CORE_LIBRARIES})
+set_target_properties("core" PROPERTIES PUBLIC_HEADER "${WANDA_CORE_HEADERS}")
+install(TARGETS "core" ARCHIVE DESTINATION "lib" PUBLIC_HEADER DESTINATION "include")
 
 ##### Wanda Daemon #####
 
@@ -76,6 +78,7 @@ set(WANDA_DAEMON_LIBRARIES
 
 add_executable("wandad" ${WANDA_DAEMON_SOURCES} ${WANDA_DAEMON_HEADERS})
 target_link_libraries("wandad" ${WANDA_DAEMON_LIBRARIES})
+install(TARGETS "wandad" RUNTIME DESTINATION "bin")
 
 ##### Wanda Controller #####
 
@@ -95,3 +98,4 @@ set(WANDA_CONTROLLER_LIBRARIES
 
 add_executable("wandac" ${WANDA_CONTROLLER_SOURCES} ${WANDA_CONTROLLER_HEADERS})
 target_link_libraries("wandac" ${WANDA_CONTROLLER_LIBRARIES})
+install(TARGETS "wandac" RUNTIME DESTINATION "bin")
