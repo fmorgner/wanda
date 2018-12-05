@@ -40,4 +40,9 @@ std::optional<command> make_command(message message)
     return std::nullopt;
 }
 
+command make_change_command()
+{
+    return {command_id::change};
+}
+
 } // namespace wanda

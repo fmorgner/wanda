@@ -60,7 +60,7 @@ struct listener : wanda::commander::listener
     {
         if (m_cli.command == "change")
         {
-            commander.send({wanda::command_id::change});
+            commander.send(wanda::make_change_command());
             commander.stop();
         }
     }
