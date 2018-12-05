@@ -33,10 +33,18 @@ class Wanda(ConanFile):
         "spdlog:fmt_external": False,
     }
 
-    def build(self):
+    def configure_cmake(self):
         cmake = CMake(self)
-        cmake.configure(source_folder=".")
+        cmake.configure()
+        return cmake
+
+    def build(self):
+        cmake = self.configure_cmake()
         cmake.build()
 
     def package(self):
-        self.copy("wanda", src="bin", dst="bin")
+        cmake = self.configure_cmake()
+        cmake.install()
+
+    def package_info(self):
+        self.cpp_info.libs = ["wanda"]
