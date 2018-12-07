@@ -18,6 +18,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
 
 include("ConanDependencies")
 include("SystemDependencies")
+include("CUTE")
 
 ##### Wanda CORE #####
 
@@ -51,6 +52,7 @@ set(WANDA_CORE_LIBRARIES
 
 add_library("wanda" ${WANDA_CORE_SOURCES} ${WANDA_CORE_HEADERS})
 target_link_libraries("wanda" ${WANDA_CORE_LIBRARIES})
+target_include_directories("wanda" INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>)
 set_target_properties("wanda" PROPERTIES PUBLIC_HEADER "${WANDA_CORE_HEADERS}")
 install(TARGETS "wanda" ARCHIVE DESTINATION "lib" PUBLIC_HEADER DESTINATION "include")
 
@@ -100,3 +102,23 @@ set(WANDA_CONTROLLER_LIBRARIES
 add_executable("wandac" ${WANDA_CONTROLLER_SOURCES} ${WANDA_CONTROLLER_HEADERS})
 target_link_libraries("wandac" ${WANDA_CONTROLLER_LIBRARIES})
 install(TARGETS "wandac" RUNTIME DESTINATION "bin")
+
+##### Wanda Core Tests #####
+if(CUTE_FOUND)
+  set(WANDA_CORE_TESTS_SUITE_SOURCES
+    "tests/test_suite_xdg.cpp"
+    )
+
+  set(WANDA_CORE_TESTS_SUITE_HEADERS
+    "tests/test_suite_xdg.hpp"
+  )
+
+  set(WANDA_CORE_TESTS_LIBRARIES
+    "wanda"
+    "LIB::CUTE"
+  )
+
+  add_executable("wanda_core_tests" "tests/core_driver.cpp" ${WANDA_CORE_TESTS_SUITE_SOURCES} ${WANDA_CORE_TESTS_SUITE_HEADERS})
+  target_link_libraries("wanda_core_tests" ${WANDA_CORE_TESTS_LIBRARIES})
+  add_test(NAME "wanda_core_tests" COMMAND "wanda_core_tests")
+endif()
