@@ -34,6 +34,7 @@ set(WANDA_CORE_HEADERS
   "src/control_connection.hpp"
   "src/deferred_failure.hpp"
   "src/environment.hpp"
+  "src/expected.hpp"
   "src/keyed.hpp"
   "src/message.hpp"
   "src/optional.hpp"
