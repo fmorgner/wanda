@@ -23,46 +23,44 @@
 
 namespace wanda
 {
+  struct setting;
 
-struct setting;
+  /**
+   * @brief A convenience type to represent setting keys
+   */
+  using key = type_wrapper<std::string, struct KeyTag>;
 
-/**
- * @brief A convenience type to represent setting keys
- */
-using key = type_wrapper<std::string, struct KeyTag>;
-
-namespace literals
-{
-/**
- * @brief UDL to create setting keys
- */
-key operator""_key(char const *str, std::size_t len);
-
-/**
- * @brief UDL to create setting schemas
- */
-std::optional<setting> operator""_setting(char const *str, std::size_t lent);
-} // namespace literals
-
-/**
- * @brief A simple wrapper for GSettings Schemas
- */
-struct setting
-{
-  struct entry
+  namespace literals
   {
+    /**
+     * @brief UDL to create setting keys
+     */
+    key operator""_key(char const * str, std::size_t len);
 
-    using value_type = std::variant<std::monostate, bool, std::int32_t, std::int64_t, std::uint32_t, std::uint64_t, double, std::string, std::vector<std::string>>;
+    /**
+     * @brief UDL to create setting schemas
+     */
+    std::optional<setting> operator""_setting(char const * str, std::size_t lent);
+  }  // namespace literals
 
-    value_type operator*() const;
-
-    template <typename Type>
-    bool operator=(Type value)
+  /**
+   * @brief A simple wrapper for GSettings Schemas
+   */
+  struct setting
+  {
+    struct entry
     {
-      struct setting_applier
+      using value_type = std::variant<std::monostate, bool, std::int32_t, std::int64_t, std::uint32_t, std::uint64_t, double, std::string, std::vector<std::string>>;
+
+      value_type operator*() const;
+
+      template<typename Type>
+      bool operator=(Type value)
       {
-        setting_applier(GSettings *setting, gchar const *key, Type value) noexcept
-            : m_result{[&] {
+        struct setting_applier
+        {
+          setting_applier(GSettings * setting, gchar const * key, Type value) noexcept
+              : m_result{[&] {
                 if constexpr (std::is_same_v<Type, bool>)
                 {
                   return g_settings_set_boolean(setting, key, value);
@@ -94,7 +92,7 @@ struct setting
                 else if constexpr (std::is_same_v<Type, std::vector<std::string>>)
                 {
                   auto temp = std::vector<gchar const *>{value.size() + 1};
-                  std::transform(value.begin(), value.end(), temp.begin(), [](auto const &str) { return str.c_str(); });
+                  std::transform(value.begin(), value.end(), temp.begin(), [](auto const & str) { return str.c_str(); });
                   return g_settings_set_strv(setting, key, temp.data());
                 }
                 else
@@ -102,53 +100,53 @@ struct setting
                   static_assert(deferred_failure<Type>{}, "Invalid argument type!");
                 }
               }()}
-        {
-        }
+          {
+          }
 
-        ~setting_applier()
-        {
-          g_settings_sync();
-        }
+          ~setting_applier()
+          {
+            g_settings_sync();
+          }
 
-        operator bool() const
-        {
-          return m_result;
-        }
+          operator bool() const
+          {
+            return m_result;
+          }
 
-      private:
-        gboolean const m_result;
-      };
+        private:
+          gboolean const m_result;
+        };
 
-      return setting_applier{m_settings.get(), m_key.get().c_str(), value};
-    }
+        return setting_applier{m_settings.get(), m_key.get().c_str(), value};
+      }
+
+    private:
+      entry(setting const & schema, key key);
+
+      std::unique_ptr<GSettings, decltype(&g_object_unref)> m_settings;
+
+      key m_key;
+
+      friend setting;
+    };
+
+    /**
+     * @brief Get the entry for the given key
+     * 
+     * @return An <code>std::optional</code> wrapping the entry associated with
+     * the given key, or an empty <code>std::optional</code> if the desired key
+     * does not exist in the setting's schema.
+     */
+    std::optional<entry> operator[](key key) const;
 
   private:
-    entry(setting const &schema, key key);
+    explicit setting(GSettingsSchema * schema);
 
-    std::unique_ptr<GSettings, decltype(&g_object_unref)> m_settings;
+    std::unique_ptr<GSettingsSchema, decltype(&g_settings_schema_unref)> m_schema;
 
-    key m_key;
-
-    friend setting;
+    friend std::optional<setting> literals::operator""_setting(char const *, std::size_t);
   };
 
-  /**
-   * @brief Get the entry for the given key
-   * 
-   * @return An <code>std::optional</code> wrapping the entry associated with
-   * the given key, or an empty <code>std::optional</code> if the desired key
-   * does not exist in the setting's schema.
-   */
-  std::optional<entry> operator[](key key) const;
-
-private:
-  explicit setting(GSettingsSchema *schema);
-
-  std::unique_ptr<GSettingsSchema, decltype(&g_settings_schema_unref)> m_schema;
-
-  friend std::optional<setting> literals::operator""_setting(char const *, std::size_t);
-};
-
-} // namespace wanda
+}  // namespace wanda
 
 #endif

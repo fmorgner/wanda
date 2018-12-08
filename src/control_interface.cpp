@@ -13,142 +13,142 @@
 
 namespace wanda
 {
+  // 'socket_deleter' implementation
 
-// 'socket_deleter' implementation
-
-socket_deleter::~socket_deleter()
-{
+  socket_deleter::~socket_deleter()
+  {
     if (std::filesystem::exists(path))
     {
-        std::filesystem::remove(path);
+      std::filesystem::remove(path);
     }
-}
+  }
 
-// 'control_interface' implementation
+  // 'control_interface' implementation
 
-control_interface::control_interface(control_interface::key key, asio::io_service &service, control_interface::protocol::endpoint endpoint, listener & listener, std::shared_ptr<spdlog::logger> logger)
-    : keyed{key},
-      m_service{service},
-      m_endpoint{std::move(endpoint)},
-      m_socket{m_service},
-      m_acceptor{m_service},
-      m_listener{listener},
-      m_logger{logger}
-{
-}
+  control_interface::control_interface(control_interface::key key, asio::io_service & service, control_interface::protocol::endpoint endpoint, listener & listener, std::shared_ptr<spdlog::logger> logger)
+      : keyed{key}
+      , m_service{service}
+      , m_endpoint{std::move(endpoint)}
+      , m_socket{m_service}
+      , m_acceptor{m_service}
+      , m_listener{listener}
+      , m_logger{logger}
+  {
+  }
 
-std::error_code control_interface::start()
-{
+  std::error_code control_interface::start()
+  {
     if (auto error = std::error_code{}; m_acceptor.open(m_endpoint.protocol(), error))
     {
-        return error;
+      return error;
     }
 
     if (auto error = std::error_code{}; m_acceptor.bind(m_endpoint, error))
     {
-        return error;
+      return error;
     }
 
     if (auto error = std::error_code{}; m_acceptor.listen(128, error))
     {
-        return error;
+      return error;
     }
     else
     {
-        perform_accept();
-        return error;
+      perform_accept();
+      return error;
     }
-}
+  }
 
-std::error_code control_interface::shutdown()
-{
-    for (auto &connection : m_connections)
+  std::error_code control_interface::shutdown()
+  {
+    for (auto & connection : m_connections)
     {
-        connection->close();
+      connection->close();
     }
 
     auto error = std::error_code{};
     return m_acceptor.close(error);
-}
+  }
 
-void control_interface::perform_accept()
-{
-    m_acceptor.async_accept(m_socket, [that = shared_from_this(), this](auto const &error) {
-        if (error && error != asio::error::operation_aborted)
+  void control_interface::perform_accept()
+  {
+    m_acceptor.async_accept(m_socket, [that = shared_from_this(), this](auto const & error) {
+      if (error && error != asio::error::operation_aborted)
+      {
+        m_logger->error("failed to accept connection because '{}'", error);
+      }
+      else
+      {
+        m_logger->info("new incoming controller connection");
+        auto [connection, inserted] = m_connections.insert(make_control_connection(std::move(m_socket)));
+        if (inserted)
         {
-            m_logger->error("failed to accept connection because '{}'", error);
+          (*connection)->add(this);
+          (*connection)->start();
         }
-        else
-        {
-            m_logger->info("new incoming controller connection");
-            auto [connection, inserted] = m_connections.insert(make_control_connection(std::move(m_socket)));
-            if (inserted)
-            {
-                (*connection)->add(this);
-                (*connection)->start();
-            }
-            perform_accept();
-        }
+        perform_accept();
+      }
     });
-}
+  }
 
-void control_interface::on_close(control_connection::pointer connection)
-{
+  void control_interface::on_close(control_connection::pointer connection)
+  {
     if (static_cast<char>(connection->current_state()) >= static_cast<char>(control_connection::state::established))
     {
-        m_logger->info("controller connection closed");
+      m_logger->info("controller connection closed");
     }
     else
     {
-        m_logger->info("controller connection aborted before it could be established");
+      m_logger->info("controller connection aborted before it could be established");
     }
     m_connections.erase(connection);
-}
+  }
 
-void control_interface::on_received(control_connection::pointer connection, message message)
-{
+  void control_interface::on_received(control_connection::pointer connection, message message)
+  {
     using namespace wanda::std_ext;
 
     if (m_connections.find(connection) == m_connections.cend())
     {
-        m_logger->error("received message from an unknown connection");
-        return;
+      m_logger->error("received message from an unknown connection");
+      return;
     }
 
     if (message.source != message_source_controller)
     {
-        m_logger->error("received a deamon message");
-        return;
+      m_logger->error("received a deamon message");
+      return;
     }
 
     if (auto state = connection->current_state(); message.command == message_command_hello && state == control_connection::state::fresh)
     {
-        m_logger->info("controller connection established");
-        if (message.argument.has_value())
-        {
-            m_logger->info("remote controller version '{}'", *message.argument);
-        }
-        connection->send({message_source_daemon, message_command_hello, message_argument_hello});
-        connection->update(control_connection::state::established);
+      m_logger->info("controller connection established");
+      if (message.argument.has_value())
+      {
+        m_logger->info("remote controller version '{}'", *message.argument);
+      }
+      connection->send({message_source_daemon, message_command_hello, message_argument_hello});
+      connection->update(control_connection::state::established);
     }
     else
     {
-        with(make_command(message), [&](auto const & command){
-            m_listener.on_received(*this, command);
-        }) || [&] { m_logger->warn("ignoring unknown message '{}'", message); };
+      with(make_command(message), [&](auto const & command) {
+        m_listener.on_received(*this, command);
+      }) ||
+          [&] { m_logger->warn("ignoring unknown message '{}'", message); };
     }
-}
+  }
 
-control_interface::pointer make_interface(asio::io_service &service, std::filesystem::path file, control_interface::listener & listener, std::shared_ptr<spdlog::logger> logger)
-{
+  control_interface::pointer make_interface(asio::io_service & service, std::filesystem::path file, control_interface::listener & listener, std::shared_ptr<spdlog::logger> logger)
+  {
     if (std::filesystem::exists(file))
     {
-        logger->error("file '{}' exists", file.native());
-        return {};
+      logger->error("file '{}' exists", file.native());
+      return {};
     }
 
     control_interface::protocol::endpoint endpoint{file.string()};
     return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint), listener, logger);
-}
+  }
 
-} // namespace wanda
+}  // namespace wanda

@@ -3,24 +3,23 @@
 
 #include <cstddef>
 #include <istream>
-#include <string>
 #include <optional>
+#include <string>
 
 namespace wanda
 {
+  inline namespace v1
+  {
+    auto constexpr message_argument_hello = "1.0.0";
+  }
 
-inline namespace v1
-{
-auto constexpr message_argument_hello = "1.0.0";
-}
+  auto constexpr message_source_controller = "C";
+  auto constexpr message_source_daemon = "D";
 
-auto constexpr message_source_controller = "C";
-auto constexpr message_source_daemon = "D";
+  auto constexpr message_command_hello = "HELLO";
 
-auto constexpr message_command_hello = "HELLO";
-
-struct message
-{
+  struct message
+  {
     explicit operator std::string() const;
 
     std::size_t size() const;
@@ -28,11 +27,11 @@ struct message
     std::string source;
     std::string command;
     std::optional<std::string> argument;
-};
+  };
 
-std::istream &operator>>(std::istream &in, message &message);
-std::ostream &operator<<(std::ostream &out, message const &message);
+  std::istream & operator>>(std::istream & in, message & message);
+  std::ostream & operator<<(std::ostream & out, message const & message);
 
-} // namespace wanda
+}  // namespace wanda
 
 #endif

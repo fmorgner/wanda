@@ -3,18 +3,17 @@
 
 namespace wanda
 {
-
-template <typename Derived>
-struct keyed
-{
+  template<typename Derived>
+  struct keyed
+  {
   protected:
     struct key
     {
     };
 
     explicit keyed(key) {}
-};
+  };
 
-} // namespace wanda
+}  // namespace wanda
 
 #endif

@@ -8,19 +8,18 @@
 
 namespace wanda
 {
-
-struct environment
-{
+  struct environment
+  {
     using map_type = std::map<std::string, std::string>;
     using iterator = map_type::iterator;
     using const_iterator = map_type::const_iterator;
     using reference = map_type::reference;
     using const_reference = map_type::const_reference;
 
-    explicit environment(char const *const *env = ::environ);
+    explicit environment(char const * const * env = ::environ);
 
-    std::string &operator[](std::string const &variable);
-    std::string const &operator[](std::string const &variable) const;
+    std::string & operator[](std::string const & variable);
+    std::string const & operator[](std::string const & variable) const;
 
     iterator begin();
     const_iterator begin() const;
@@ -32,8 +31,8 @@ struct environment
 
   private:
     map_type m_cache{};
-};
+  };
 
-} // namespace wanda
+}  // namespace wanda
 
 #endif

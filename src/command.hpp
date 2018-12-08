@@ -9,23 +9,23 @@
 
 namespace wanda
 {
-enum struct command_id : char
-{
+  enum struct command_id : char
+  {
     change,
-};
+  };
 
-struct command
-{
+  struct command
+  {
     command_id const id;
     std::vector<std::string> const arguments;
 
     std::optional<wanda::message> message() const;
-};
+  };
 
-std::optional<command> make_command(message message);
+  std::optional<command> make_command(message message);
 
-command make_change_command();
+  command make_change_command();
 
-} // namespace wanda
+}  // namespace wanda
 
 #endif

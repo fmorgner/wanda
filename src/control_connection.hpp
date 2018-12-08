@@ -15,24 +15,23 @@
 
 namespace wanda
 {
-
-struct control_connection : keyed<control_connection>, std::enable_shared_from_this<control_connection>
-{
+  struct control_connection : keyed<control_connection>, std::enable_shared_from_this<control_connection>
+  {
     using protocol = asio::local::stream_protocol;
     using pointer = std::shared_ptr<control_connection>;
 
     struct listener
     {
-        virtual void on_close(pointer connection) {}
-        virtual void on_received(pointer connection, message message) {}
-        virtual void on_error(pointer connection, std::error_code) {}
+      virtual void on_close(pointer connection) {}
+      virtual void on_received(pointer connection, message message) {}
+      virtual void on_error(pointer connection, std::error_code) {}
     };
 
     enum struct state : std::underlying_type_t<std::byte>
     {
-        unknown,
-        fresh,
-        established,
+      unknown,
+      fresh,
+      established,
     };
 
     /**
@@ -48,14 +47,14 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
      * 
      * @returns <code>true</code> iff. the listener was not already in the listener set
      */
-    bool add(listener *listener);
+    bool add(listener * listener);
 
     /**
      * @brief Remove the given listener from this control connection's listener set
      * 
      * @return <code>true</code> iff. the listener was previously registered with this control connection
      */
-    bool remove(listener *listener);
+    bool remove(listener * listener);
 
     /**
      * @brief Start I/O processing for this control connection
@@ -74,7 +73,7 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
     state current_state() const;
 
   private:
-    friend pointer make_control_connection(protocol::socket &&socket);
+    friend pointer make_control_connection(protocol::socket && socket);
 
     void perform_read();
 
@@ -85,10 +84,10 @@ struct control_connection : keyed<control_connection>, std::enable_shared_from_t
     std::ostream m_output{&m_out};
     std::set<listener *> m_listeners{};
     state m_state{};
-};
+  };
 
-control_connection::pointer make_control_connection(control_connection::protocol::socket &&socket);
+  control_connection::pointer make_control_connection(control_connection::protocol::socket && socket);
 
-} // namespace wanda
+}  // namespace wanda
 
 #endif

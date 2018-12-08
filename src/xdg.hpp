@@ -9,17 +9,17 @@
 
 namespace wanda
 {
-enum struct xdg_directory : std::underlying_type_t<std::byte>
-{
+  enum struct xdg_directory : std::underlying_type_t<std::byte>
+  {
     data_home,
     config_home,
     cache_home,
     runtime_dir,
-};
+  };
 
-std::string xdg_variable(xdg_directory directory);
+  std::string xdg_variable(xdg_directory directory);
 
-std::filesystem::path xdg_path_for(xdg_directory directory, environment const &environment);
-} // namespace wanda
+  std::filesystem::path xdg_path_for(xdg_directory directory, environment const & environment);
+}  // namespace wanda
 
 #endif

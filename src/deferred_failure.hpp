@@ -11,8 +11,8 @@
 
 namespace
 {
-template <typename...>
-using deferred_failure = std::false_type;
-} // namespace
+  template<typename...>
+  using deferred_failure = std::false_type;
+}  // namespace
 
 #endif

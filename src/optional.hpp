@@ -11,37 +11,37 @@
 
 namespace wanda::std_ext
 {
-
-struct failable
-{
+  struct failable
+  {
     constexpr static auto success() { return failable{false}; }
     constexpr static auto failure() { return failable{true}; }
 
-    template <typename Handler>
+    template<typename Handler>
     constexpr auto operator||(Handler handler) const
     {
-        if (m_failed)
-        {
-            handler();
-        }
+      if (m_failed)
+      {
+        handler();
+      }
     }
 
   private:
-    constexpr explicit failable(bool failed) : m_failed{failed} {};
+    constexpr explicit failable(bool failed)
+        : m_failed{failed} {};
     bool const m_failed;
-};
+  };
 
-template <typename ObjectType, typename HandlerType>
-auto with(std::optional<ObjectType> &&object, HandlerType handler)
-{
+  template<typename ObjectType, typename HandlerType>
+  auto with(std::optional<ObjectType> && object, HandlerType handler)
+  {
     if (object)
     {
-        handler(object.value());
-        return failable::success();
+      handler(object.value());
+      return failable::success();
     }
     return failable::failure();
-}
+  }
 
-} // namespace wanda::std_ext
+}  // namespace wanda::std_ext
 
 #endif
