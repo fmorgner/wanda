@@ -1,4 +1,5 @@
 #include "commander.hpp"
+#include "logging.hpp"
 #include "message.hpp"
 #include "optional.hpp"
 
@@ -6,12 +7,11 @@
 
 namespace wanda
 {
-  commander::commander(asio::io_service & service, std::filesystem::path socket, listener & listener, std::shared_ptr<spdlog::logger> logger)
+  commander::commander(asio::io_service & service, std::filesystem::path socket, listener & listener)
       : m_service{service}
       , m_endpoint{socket.string()}
       , m_socket{service}
       , m_listener{listener}
-      , m_logger{logger}
   {
   }
 
@@ -20,11 +20,11 @@ namespace wanda
     m_socket.async_connect(m_endpoint, [&](auto const & error) {
       if (error)
       {
-        m_logger->error("error while connecting to control interface: '{}'", error.message());
+        get_logger()->error("error while connecting to control interface: '{}'", error.message());
       }
       else
       {
-        m_logger->info("establishing connection to wanda deamon");
+        get_logger()->info("establishing connection to wanda deamon");
         m_connection = wanda::make_control_connection(std::move(m_socket));
         m_connection->add(this);
         m_connection->start();
@@ -35,7 +35,7 @@ namespace wanda
 
   void commander::stop()
   {
-    m_logger->info("closing control connection");
+    get_logger()->info("closing control connection");
     m_connection->close();
   }
 
@@ -45,31 +45,31 @@ namespace wanda
 
     if (!m_connection || m_connection->current_state() != control_connection::state::established)
     {
-      m_logger->error("tried to send command without an established connection");
+      get_logger()->error("tried to send command without an established connection");
       m_listener.on_error(*this, "tried to send command without an established connection");
       return;
     }
 
     with(command.message(), [&](auto const & message) { m_connection->send(message); }) ||
-        [&] { m_logger->error("unknown command"); };
+        [&] { get_logger()->error("unknown command"); };
   }
 
   void commander::on_error(control_connection::pointer connection, std::error_code error)
   {
-    m_logger->error("control interface communication error: '{}'", error.message());
+    get_logger()->error("control interface communication error: '{}'", error.message());
   }
 
   void commander::on_received(wanda::control_connection::pointer connection, message message)
   {
     if (auto state = connection->current_state(); message.command == "HELLO" && state == control_connection::state::fresh)
     {
-      m_logger->info("connection to wanda deamon successfully established");
+      get_logger()->info("connection to wanda deamon successfully established");
       connection->update(control_connection::state::established);
       m_listener.on_connected(*this);
     }
     else
     {
-      m_logger->error("unexpected message: '{}'", message);
+      get_logger()->error("unexpected message: '{}'", message);
       m_listener.on_error(*this, "unexpected message '" + static_cast<std::string>(message) + '\'');
     }
   }

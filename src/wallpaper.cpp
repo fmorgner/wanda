@@ -1,10 +1,11 @@
-#include "wallpaper.hpp"
+#include "logging.hpp"
 #include "optional.hpp"
 #include "setting.hpp"
+#include "wallpaper.hpp"
 
 namespace wanda
 {
-  void set_wallpaper(std::filesystem::path wallpaper, std::shared_ptr<spdlog::logger> logger)
+  void set_wallpaper(std::filesystem::path wallpaper)
   {
     using namespace wanda::literals;
     using namespace wanda::std_ext;
@@ -14,9 +15,9 @@ namespace wanda
       with(setting["picture-uri"_key], [&](auto & value) {
         value = "file://" + wallpaper.native();
       }) ||
-          [&] { logger->error("invalid settings key"); };
+          [&] { get_logger()->error("invalid settings key"); };
     }) ||
-        [&] { logger->error("invalid setting"); };
+        [&] { get_logger()->error("invalid setting"); };
   }
 
 }  // namespace wanda

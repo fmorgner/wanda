@@ -36,7 +36,7 @@ namespace wanda
       virtual void on_received(control_interface & interface, command command){};
     };
 
-    control_interface(key, asio::io_service & service, protocol::endpoint endpoint, listener & listener, std::shared_ptr<spdlog::logger> logger);
+    control_interface(key, asio::io_service & service, protocol::endpoint endpoint, listener & listener);
 
     std::error_code start();
     std::error_code shutdown();
@@ -47,7 +47,7 @@ namespace wanda
   private:
     void perform_accept();
 
-    friend pointer make_interface(asio::io_service & service, std::filesystem::path file, control_interface::listener & listener, std::shared_ptr<spdlog::logger> logger);
+    friend pointer make_interface(asio::io_service & service, std::filesystem::path file, control_interface::listener & listener);
 
     asio::io_service & m_service;
     protocol::endpoint m_endpoint;
@@ -56,10 +56,9 @@ namespace wanda
     listener & m_listener;
     socket_deleter m_deleter{m_endpoint.path()};
     std::set<control_connection::pointer> m_connections;
-    std::shared_ptr<spdlog::logger> m_logger;
   };
 
-  control_interface::pointer make_interface(asio::io_service & service, std::filesystem::path file, control_interface::listener & listener, std::shared_ptr<spdlog::logger> logger);
+  control_interface::pointer make_interface(asio::io_service & service, std::filesystem::path file, control_interface::listener & listener);
 
 }  // namespace wanda
 

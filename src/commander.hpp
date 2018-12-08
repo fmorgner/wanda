@@ -6,7 +6,6 @@
 #include "message.hpp"
 
 #include <asio.hpp>
-#include <spdlog/logger.h>
 
 #include <filesystem>
 #include <memory>
@@ -25,7 +24,7 @@ namespace wanda
       virtual void on_error(commander & commander, std::string error){};
     };
 
-    commander(asio::io_service & service, std::filesystem::path socket, listener & listener, std::shared_ptr<spdlog::logger> logger);
+    commander(asio::io_service & service, std::filesystem::path socket, listener & listener);
 
     void start();
     void stop();
@@ -40,7 +39,6 @@ namespace wanda
     wanda::control_connection::protocol::socket m_socket;
     wanda::control_connection::pointer m_connection;
     listener & m_listener;
-    std::shared_ptr<spdlog::logger> m_logger;
   };
 
 }  // namespace wanda

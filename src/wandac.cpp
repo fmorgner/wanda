@@ -1,6 +1,7 @@
 #include "command.hpp"
 #include "commander.hpp"
 #include "environment.hpp"
+#include "logging.hpp"
 #include "xdg.hpp"
 
 #include <asio.hpp>
@@ -50,9 +51,8 @@ struct cli
 
 struct listener : wanda::commander::listener
 {
-  listener(::cli & cli, std::shared_ptr<spdlog::logger> logger)
-      : m_logger{logger}
-      , m_cli{cli}
+  listener(::cli & cli)
+      : m_cli{cli}
   {
   }
 
@@ -66,7 +66,6 @@ struct listener : wanda::commander::listener
   }
 
 private:
-  std::shared_ptr<spdlog::logger> m_logger;
   ::cli & m_cli;
 };
 
@@ -83,14 +82,15 @@ int main(int argc, char const * const * argv)
     return EXIT_SUCCESS;
   }
 
-  auto log = spdlog::stdout_color_mt("wandac");
+  wanda::initialize_logger(std::make_shared<spdlog::sinks::stderr_color_sink_st>());
+
   auto interface = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, wanda::environment{}) / ".wanda_interface";
   auto service = asio::io_service{};
-  auto listener = ::listener{cli, log};
+  auto listener = ::listener{cli};
 
-  auto commander = wanda::commander{service, interface, listener, log};
+  auto commander = wanda::commander{service, interface, listener};
 
-  log->info("trying to connect to wanda control interface on '{}'", interface.native());
+  wanda::get_logger()->info("trying to connect to wanda control interface on '{}'", interface.native());
   commander.start();
 
   service.run();

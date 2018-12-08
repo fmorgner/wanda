@@ -26,6 +26,7 @@ set(WANDA_CORE_SOURCES
   "src/command.cpp"
   "src/control_connection.cpp"
   "src/environment.cpp"
+  "src/logging.cpp"
   "src/message.cpp"
   "src/xdg.cpp"
 )
@@ -37,6 +38,7 @@ set(WANDA_CORE_HEADERS
   "src/environment.hpp"
   "src/expected.hpp"
   "src/keyed.hpp"
+  "src/logging.hpp"
   "src/message.hpp"
   "src/optional.hpp"
   "src/type_wrapper.hpp"

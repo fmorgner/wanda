@@ -9,7 +9,7 @@
 
 namespace wanda
 {
-  void set_wallpaper(std::filesystem::path wallpaper, std::shared_ptr<spdlog::logger> logger);
+  void set_wallpaper(std::filesystem::path wallpaper);
 }  // namespace wanda
 
 #endif

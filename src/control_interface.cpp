@@ -1,4 +1,5 @@
 #include "control_interface.hpp"
+#include "logging.hpp"
 #include "optional.hpp"
 
 #include <spdlog/fmt/ostr.h>
@@ -25,14 +26,13 @@ namespace wanda
 
   // 'control_interface' implementation
 
-  control_interface::control_interface(control_interface::key key, asio::io_service & service, control_interface::protocol::endpoint endpoint, listener & listener, std::shared_ptr<spdlog::logger> logger)
+  control_interface::control_interface(control_interface::key key, asio::io_service & service, control_interface::protocol::endpoint endpoint, listener & listener)
       : keyed{key}
       , m_service{service}
       , m_endpoint{std::move(endpoint)}
       , m_socket{m_service}
       , m_acceptor{m_service}
       , m_listener{listener}
-      , m_logger{logger}
   {
   }
 
@@ -75,11 +75,11 @@ namespace wanda
     m_acceptor.async_accept(m_socket, [that = shared_from_this(), this](auto const & error) {
       if (error && error != asio::error::operation_aborted)
       {
-        m_logger->error("failed to accept connection because '{}'", error);
+        get_logger()->error("failed to accept connection because '{}'", error);
       }
       else
       {
-        m_logger->info("new incoming controller connection");
+        get_logger()->info("new incoming controller connection");
         auto [connection, inserted] = m_connections.insert(make_control_connection(std::move(m_socket)));
         if (inserted)
         {
@@ -95,11 +95,11 @@ namespace wanda
   {
     if (static_cast<char>(connection->current_state()) >= static_cast<char>(control_connection::state::established))
     {
-      m_logger->info("controller connection closed");
+      get_logger()->info("controller connection closed");
     }
     else
     {
-      m_logger->info("controller connection aborted before it could be established");
+      get_logger()->info("controller connection aborted before it could be established");
     }
     m_connections.erase(connection);
   }
@@ -110,22 +110,22 @@ namespace wanda
 
     if (m_connections.find(connection) == m_connections.cend())
     {
-      m_logger->error("received message from an unknown connection");
+      get_logger()->error("received message from an unknown connection");
       return;
     }
 
     if (message.source != message_source_controller)
     {
-      m_logger->error("received a deamon message");
+      get_logger()->error("received a deamon message");
       return;
     }
 
     if (auto state = connection->current_state(); message.command == message_command_hello && state == control_connection::state::fresh)
     {
-      m_logger->info("controller connection established");
+      get_logger()->info("controller connection established");
       if (message.argument.has_value())
       {
-        m_logger->info("remote controller version '{}'", *message.argument);
+        get_logger()->info("remote controller version '{}'", *message.argument);
       }
       connection->send({message_source_daemon, message_command_hello, message_argument_hello});
       connection->update(control_connection::state::established);
@@ -135,20 +135,20 @@ namespace wanda
       with(make_command(message), [&](auto const & command) {
         m_listener.on_received(*this, command);
       }) ||
-          [&] { m_logger->warn("ignoring unknown message '{}'", message); };
+          [&] { get_logger()->warn("ignoring unknown message '{}'", message); };
     }
   }
 
-  control_interface::pointer make_interface(asio::io_service & service, std::filesystem::path file, control_interface::listener & listener, std::shared_ptr<spdlog::logger> logger)
+  control_interface::pointer make_interface(asio::io_service & service, std::filesystem::path file, control_interface::listener & listener)
   {
     if (std::filesystem::exists(file))
     {
-      logger->error("file '{}' exists", file.native());
+      get_logger()->error("file '{}' exists", file.native());
       return {};
     }
 
     control_interface::protocol::endpoint endpoint{file.string()};
-    return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint), listener, logger);
+    return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint), listener);
   }
 
 }  // namespace wanda
