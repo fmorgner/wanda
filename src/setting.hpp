@@ -52,8 +52,16 @@ namespace wanda
     {
       using value_type = std::variant<std::monostate, bool, std::int32_t, std::int64_t, std::uint32_t, std::uint64_t, double, std::string, std::vector<std::string>>;
 
+      /**
+       * @brief Get the value of the settings entry
+       */
       value_type operator*() const;
 
+      /**
+       * @brief Assign the given @p value to the settings entry
+       * 
+       * @returns @p true iff. the value could be successfully assigned
+       */
       template<typename Type>
       bool operator=(Type value)
       {

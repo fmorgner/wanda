@@ -1,3 +1,9 @@
+/**
+ * @file   logging.hpp
+ * @author Felix Morgner (felix.morgner@gmail.com)
+ * @since  1.0.0
+ */
+
 #ifndef WANDA_LOGGING_HPP
 #define WANDA_LOGGING_HPP
 
@@ -8,10 +14,21 @@
 
 namespace wanda
 {
+  /**
+   * @brief A covenience alias to represent a handle for a logger
+   */
   using logger_ptr = std::shared_ptr<spdlog::logger>;
 
+  /**
+   * @brief Initialize the shared logger
+   * 
+   * @note The logger will only ever be initialized once, even if this function is called multiple times
+   */
   void initialize_logger(spdlog::sink_ptr sink = std::make_shared<spdlog::sinks::null_sink_st>());
 
+  /**
+   * @brief Get the shared logger
+   */
   logger_ptr get_logger();
 }  // namespace wanda
 

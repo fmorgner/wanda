@@ -1,7 +1,7 @@
 /**
- * @file optional.hpp
+ * @file   optional.hpp
  * @author Felix Morgner (felix.morgner@gmail.com)
- * @since 1.0.0
+ * @since  1.0.0
  */
 
 #ifndef WANDA_OPTIONAL_HPP
@@ -11,13 +11,26 @@
 
 namespace wanda::std_ext
 {
+  /**
+   * @brief A type to represent a computation that could fail
+   */
   struct failable
   {
+    /**
+     * @brief A factory to create a successful computation
+     */
     constexpr static auto success() { return failable{false}; }
+
+    /**
+     * @brief A factory to create a failed computation
+     */
     constexpr static auto failure() { return failable{true}; }
 
+    /**
+     * @brief Execute the given handler if the computation failed
+     */
     template<typename Handler>
-    constexpr auto operator||(Handler handler) const
+    constexpr void operator||(Handler handler) const
     {
       if (m_failed)
       {
@@ -31,6 +44,11 @@ namespace wanda::std_ext
     bool const m_failed;
   };
 
+  /**
+   * @brief Unwrap the given optional object, if present, and pass it to the handler
+   * 
+   * @return A successful computation iff. the object was present, a failed computation otherwise.
+   */
   template<typename ObjectType, typename HandlerType>
   auto with(std::optional<ObjectType> && object, HandlerType handler)
   {

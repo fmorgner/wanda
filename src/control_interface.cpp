@@ -139,15 +139,15 @@ namespace wanda
     }
   }
 
-  control_interface::pointer make_interface(asio::io_service & service, std::filesystem::path file, control_interface::listener & listener)
+  control_interface::pointer make_interface(asio::io_service & service, std::filesystem::path socket, control_interface::listener & listener)
   {
-    if (std::filesystem::exists(file))
+    if (std::filesystem::exists(socket))
     {
-      get_logger()->error("file '{}' exists", file.native());
+      get_logger()->error("socket '{}' exists", socket.native());
       return {};
     }
 
-    control_interface::protocol::endpoint endpoint{file.string()};
+    control_interface::protocol::endpoint endpoint{socket.string()};
     return std::make_shared<control_interface>(control_interface::key{}, service, std::move(endpoint), listener);
   }
 

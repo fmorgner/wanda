@@ -1,3 +1,9 @@
+/**
+ * @file   expected.hpp
+ * @author Felix Morgner (felix.morgner@gmail.com)
+ * @since  1.0.0
+ */
+
 #ifndef WANDA_EXPECTED_HPP
 #define WANDA_EXPECTED_HPP
 
@@ -7,6 +13,9 @@
 
 namespace wanda
 {
+  /**
+    * @brief A type to represent the error case of a computation based on #wanda::expected
+    */
   template<typename ErrorType>
   struct unexpected
   {

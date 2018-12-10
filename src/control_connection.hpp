@@ -15,11 +15,17 @@
 
 namespace wanda
 {
+  /**
+   * @brief A connection to a remote control endpoint
+   */
   struct control_connection : keyed<control_connection>, std::enable_shared_from_this<control_connection>
   {
     using protocol = asio::local::stream_protocol;
     using pointer = std::shared_ptr<control_connection>;
 
+    /**
+     * @brief The interface to be implemented by the control interface listener
+     */
     struct listener
     {
       virtual void on_close(pointer connection) {}
@@ -27,18 +33,21 @@ namespace wanda
       virtual void on_error(pointer connection, std::error_code) {}
     };
 
+    /**
+     * @brief A enum to describe different connection states
+     */
     enum struct state : std::underlying_type_t<std::byte>
     {
-      unknown,
-      fresh,
-      established,
+      unknown,  //< Connection is in an unknown state
+      fresh,  //< Connection is freshly created but not established
+      established,  //< Connection has been established
     };
 
     /**
      * @internal
      * @brief Construct a new control connection object
      * 
-     * @param socket The socket connected to the remote control endpoint
+     * @note This constructor is keyed on a private key type so it can only be constructed using the #wanda::make_connection factory
      */
     control_connection(key, protocol::socket socket);
 
@@ -66,10 +75,19 @@ namespace wanda
      */
     void close();
 
+    /**
+     * @brief Send the given message to the remote endpoint
+     */
     void send(message message);
 
+    /**
+     * @brief Set the connection state to the provided state
+     */
     void update(state state);
 
+    /**
+     * @brief Get the current connection state
+     */
     state current_state() const;
 
   private:
@@ -86,6 +104,9 @@ namespace wanda
     state m_state{};
   };
 
+  /**
+   * @brief Create a new control connection
+   */
   control_connection::pointer make_control_connection(control_connection::protocol::socket && socket);
 
 }  // namespace wanda

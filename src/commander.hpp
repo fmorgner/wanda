@@ -15,8 +15,15 @@
 
 namespace wanda
 {
+  /**
+   * @brief The remote control client
+   * 
+   */
   struct commander : wanda::control_connection::listener
   {
+    /**
+     * @brief The interface to be implemented by remote control listeners
+     */
     struct listener
     {
       virtual void on_connected(commander & commander){};
@@ -24,10 +31,24 @@ namespace wanda
       virtual void on_error(commander & commander, std::string error){};
     };
 
+    /**
+     * @brief Construct a new commander
+     */
     commander(asio::io_service & service, std::filesystem::path socket, listener & listener);
 
+    /**
+     * @brief Start communication with the remote daemon endpoint
+     */
     void start();
+
+    /**
+     * @brief Stop communication with the remote daemon endpoint
+     */
     void stop();
+
+    /**
+     * @brief Send a command to the remote daemon endpoint
+     */
     void send(command command);
 
     void on_error(control_connection::pointer connection, std::error_code error) override;

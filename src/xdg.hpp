@@ -1,3 +1,9 @@
+/**
+ * @file   xdg.hpp
+ * @author Felix Morgner (felix.morgner@gmail.com)
+ * @since  1.0.0
+ */
+
 #ifndef WANDA_XDG_HPP
 #define WANDA_XDG_HPP
 
