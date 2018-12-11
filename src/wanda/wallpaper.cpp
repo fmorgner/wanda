@@ -1,7 +1,7 @@
-#include "logging.hpp"
-#include "optional.hpp"
-#include "setting.hpp"
-#include "wallpaper.hpp"
+#include <wanda/logging.hpp>
+#include <wanda/optional.hpp>
+#include <wanda/setting.hpp>
+#include <wanda/wallpaper.hpp>
 
 namespace wanda
 {

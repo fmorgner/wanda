@@ -1,4 +1,4 @@
-#include "command.hpp"
+#include <wanda/command.hpp>
 
 namespace wanda
 {

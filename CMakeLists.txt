@@ -16,111 +16,94 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
 
+if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+endif()
+
+if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+endif()
+
+if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+endif()
+
 include("ConanDependencies")
 include("SystemDependencies")
 include("CUTE")
+include("WandaTargets")
 
-##### Wanda CORE #####
+add_wanda_library(NAME "wanda"
+  SOURCES
+  "command.cpp"
+  "control_connection.cpp"
+  "environment.cpp"
+  "logging.cpp"
+  "message.cpp"
+  "xdg.cpp"
 
-set(WANDA_CORE_SOURCES
-  "src/command.cpp"
-  "src/control_connection.cpp"
-  "src/environment.cpp"
-  "src/logging.cpp"
-  "src/message.cpp"
-  "src/xdg.cpp"
-)
+  HEADERS
+  "command.hpp"
+  "control_connection.hpp"
+  "deferred_failure.hpp"
+  "environment.hpp"
+  "expected.hpp"
+  "keyed.hpp"
+  "logging.hpp"
+  "message.hpp"
+  "optional.hpp"
+  "type_wrapper.hpp"
+  "xdg.hpp"
 
-set(WANDA_CORE_HEADERS
-  "src/command.hpp"
-  "src/control_connection.hpp"
-  "src/deferred_failure.hpp"
-  "src/environment.hpp"
-  "src/expected.hpp"
-  "src/keyed.hpp"
-  "src/logging.hpp"
-  "src/message.hpp"
-  "src/optional.hpp"
-  "src/type_wrapper.hpp"
-  "src/xdg.hpp"
-)
-
-set(WANDA_CORE_LIBRARIES
+  LIBRARIES
   "CONAN_PKG::asio"
   "CONAN_PKG::spdlog"
   "SYSTEM::C++FS"
   "Threads::Threads"
 )
 
-add_library("wanda" ${WANDA_CORE_SOURCES} ${WANDA_CORE_HEADERS})
-target_link_libraries("wanda" ${WANDA_CORE_LIBRARIES})
-target_include_directories("wanda" INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>)
-set_target_properties("wanda" PROPERTIES PUBLIC_HEADER "${WANDA_CORE_HEADERS}")
-install(TARGETS "wanda" ARCHIVE DESTINATION "lib" PUBLIC_HEADER DESTINATION "include")
+add_wanda_executable(NAME "wandad"
+  SOURCES
+  "control_interface.cpp"
+  "filesystem.cpp"
+  "setting.cpp"
+  "wallpaper.cpp"
+  "wandad.cpp"
 
-##### Wanda Daemon #####
+  HEADERS
+  "control_interface.hpp"
+  "filesystem.hpp"
+  "setting.hpp"
+  "wallpaper.hpp"
 
-set(WANDA_DAEMON_SOURCES
-  "src/control_interface.cpp"
-  "src/filesystem.cpp"
-  "src/setting.cpp"
-  "src/wallpaper.cpp"
-  "src/wandad.cpp"
-)
-
-set(WANDA_DAEMON_HEADERS
-  "src/control_interface.hpp"
-  "src/filesystem.hpp"
-  "src/setting.hpp"
-  "src/wallpaper.hpp"
-)
-
-set(WANDA_DAEMON_LIBRARIES
+  LIBRARIES
   "wanda"
   "CONAN_PKG::clara"
   "SYSTEM::GIO"
 )
 
-add_executable("wandad" ${WANDA_DAEMON_SOURCES} ${WANDA_DAEMON_HEADERS})
-target_link_libraries("wandad" ${WANDA_DAEMON_LIBRARIES})
-install(TARGETS "wandad" RUNTIME DESTINATION "bin")
+add_wanda_executable(NAME "wandac"
+  SOURCES
+  "commander.cpp"
+  "wandac.cpp"
 
-##### Wanda Controller #####
+  HEADERS
+  "commander.hpp"
 
-set(WANDA_CONTROLLER_SOURCES
-  "src/commander.cpp"
-  "src/wandac.cpp"
-)
-
-set(WANDA_CONTROLLER_HEADERS
-  "src/commander.hpp"
-)
-
-set(WANDA_CONTROLLER_LIBRARIES
+  LIBRARIES
   "wanda"
   "CONAN_PKG::clara"
 )
 
-add_executable("wandac" ${WANDA_CONTROLLER_SOURCES} ${WANDA_CONTROLLER_HEADERS})
-target_link_libraries("wandac" ${WANDA_CONTROLLER_LIBRARIES})
-install(TARGETS "wandac" RUNTIME DESTINATION "bin")
+add_wanda_test(NAME "wanda_core"
+  SOURCES
+  "core_driver.cpp"
+  "test_suite_xdg.cpp"
 
-##### Wanda Core Tests #####
-if(CUTE_FOUND)
-  set(WANDA_CORE_TESTS_SUITE_SOURCES
-    "tests/test_suite_xdg.cpp"
-    )
+  HEADERS
+  "test_suite_xdg.hpp"
 
-  set(WANDA_CORE_TESTS_SUITE_HEADERS
-    "tests/test_suite_xdg.hpp"
-  )
-
-  set(WANDA_CORE_TESTS_LIBRARIES
-    "wanda"
-    "LIB::CUTE"
-  )
-
-  add_executable("wanda_core_tests" "tests/core_driver.cpp" ${WANDA_CORE_TESTS_SUITE_SOURCES} ${WANDA_CORE_TESTS_SUITE_HEADERS})
-  target_link_libraries("wanda_core_tests" ${WANDA_CORE_TESTS_LIBRARIES})
-  add_test(NAME "wanda_core_tests" COMMAND "wanda_core_tests")
-endif()
+  LIBRARIES
+  "wanda"
+  "LIB::CUTE"
+)

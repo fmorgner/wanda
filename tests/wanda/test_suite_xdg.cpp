@@ -1,5 +1,5 @@
 #include "test_suite_xdg.hpp"
-#include "xdg.hpp"
+#include <wanda/xdg.hpp>
 
 #include "cute/cute.h"
 

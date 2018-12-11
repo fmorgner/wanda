@@ -1,4 +1,4 @@
-#include "logging.hpp"
+#include <wanda/logging.hpp>
 
 namespace wanda
 {

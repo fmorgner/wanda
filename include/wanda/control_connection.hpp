@@ -1,8 +1,8 @@
 #ifndef WANDA_CONTROL_CONNECTION_HPP
 #define WANDA_CONTROL_CONNECTION_HPP
 
-#include "keyed.hpp"
-#include "message.hpp"
+#include <wanda/keyed.hpp>
+#include <wanda/message.hpp>
 
 #include <asio.hpp>
 

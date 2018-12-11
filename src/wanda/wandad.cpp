@@ -1,12 +1,12 @@
-#include "command.hpp"
-#include "control_interface.hpp"
-#include "environment.hpp"
-#include "filesystem.hpp"
-#include "logging.hpp"
-#include "optional.hpp"
-#include "setting.hpp"
-#include "wallpaper.hpp"
-#include "xdg.hpp"
+#include <wanda/command.hpp>
+#include <wanda/control_interface.hpp>
+#include <wanda/environment.hpp>
+#include <wanda/filesystem.hpp>
+#include <wanda/logging.hpp>
+#include <wanda/optional.hpp>
+#include <wanda/setting.hpp>
+#include <wanda/wallpaper.hpp>
+#include <wanda/xdg.hpp>
 
 #include <asio.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>

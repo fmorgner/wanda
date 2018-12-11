@@ -1,4 +1,4 @@
-#include "xdg.hpp"
+#include <wanda/xdg.hpp>
 
 #include <unistd.h>
 

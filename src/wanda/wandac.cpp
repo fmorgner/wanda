@@ -1,8 +1,8 @@
-#include "command.hpp"
-#include "commander.hpp"
-#include "environment.hpp"
-#include "logging.hpp"
-#include "xdg.hpp"
+#include <wanda/command.hpp>
+#include <wanda/commander.hpp>
+#include <wanda/environment.hpp>
+#include <wanda/logging.hpp>
+#include <wanda/xdg.hpp>
 
 #include <asio.hpp>
 #include <clara.hpp>

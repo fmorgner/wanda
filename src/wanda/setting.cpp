@@ -1,4 +1,4 @@
-#include "setting.hpp"
+#include <wanda/setting.hpp>
 
 #include <algorithm>
 #include <type_traits>

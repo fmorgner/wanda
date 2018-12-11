@@ -1,6 +1,6 @@
-#include "control_interface.hpp"
-#include "logging.hpp"
-#include "optional.hpp"
+#include <wanda/control_interface.hpp>
+#include <wanda/logging.hpp>
+#include <wanda/optional.hpp>
 
 #include <spdlog/fmt/ostr.h>
 
