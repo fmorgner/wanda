@@ -92,44 +92,40 @@ endfunction()
 function(add_wanda_test)
   set(OPTIONS)
   set(SV_ARGS "NAME")
-  set(MV_ARGS "SOURCES;HEADERS;LIBRARIES")
+  set(MV_ARGS "HEADERS;LIBRARIES")
   cmake_parse_arguments(WANDA_TEST "${OPTIONS}" "${SV_ARGS}" "${MV_ARGS}" ${ARGN})
 
   if(NOT WANDA_TEST_NAME)
     message(FATAL_ERROR "Missing argument 'NAME' to call of 'add_wanda_test'")
   endif()
 
-  if(NOT WANDA_TEST_SOURCES)
-    message(FATAL_ERROR "Missing argument 'SOURCES' to call of 'add_wanda_test'")
-  endif()
-
-  set(RESOLVED_SOURCES)
-  foreach(SOURCE IN LISTS WANDA_TEST_SOURCES)
-    list(APPEND RESOLVED_SOURCES "tests/wanda/${SOURCE}")
-  endforeach()
-
-  set(RESOLVED_HEADERS)
-  foreach(HEADER IN LISTS WANDA_TEST_HEADERS)
-    list(APPEND RESOLVED_HEADERS "tests/wanda/${HEADER}")
-  endforeach()
-
   if(NOT CUTE_FOUND)
     message(STATUS "CUTE not found. Skipping test '${WANDA_TEST_NAME}'")
     return()
   endif()
 
-  add_executable("${WANDA_TEST_NAME}_driver"
-    ${RESOLVED_SOURCES} # Source files
+  set(RESOLVED_HEADERS)
+  foreach(HEADER IN LISTS WANDA_TEST_HEADERS)
+    list(APPEND RESOLVED_HEADERS "include/wanda/${HEADER}")
+  endforeach()
+
+  if(NOT TARGET "wanda_test_driver")
+    add_library("wanda_test_driver" OBJECT "tests/wanda/driver.cpp")
+  endif()
+
+  add_executable("test_${WANDA_TEST_NAME}"
+    "tests/wanda/test_suite_${WANDA_TEST_NAME}.cpp"
     ${RESOLVED_HEADERS} # Header files
+    $<TARGET_OBJECTS:wanda_test_driver>
   )
 
-  target_include_directories("${WANDA_TEST_NAME}_driver" SYSTEM PRIVATE
+  target_include_directories("test_${WANDA_TEST_NAME}" SYSTEM PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   )
 
-  target_link_libraries("${WANDA_TEST_NAME}_driver"
+  target_link_libraries("test_${WANDA_TEST_NAME}"
     ${WANDA_TEST_LIBRARIES}
   )
 
-  add_test(NAME "${WANDA_TEST_NAME}" COMMAND "${WANDA_TEST_NAME}_driver")
+  add_test(NAME "${WANDA_TEST_NAME}" COMMAND "test_${WANDA_TEST_NAME}")
 endfunction()

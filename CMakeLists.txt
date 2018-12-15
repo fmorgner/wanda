@@ -95,14 +95,7 @@ add_wanda_executable(NAME "wandac"
   "CONAN_PKG::clara"
 )
 
-add_wanda_test(NAME "wanda_core"
-  SOURCES
-  "core_driver.cpp"
-  "test_suite_xdg.cpp"
-
-  HEADERS
-  "test_suite_xdg.hpp"
-
+add_wanda_test(NAME "xdg"
   LIBRARIES
   "wanda"
   "LIB::CUTE"

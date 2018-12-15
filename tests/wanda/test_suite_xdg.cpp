@@ -1,13 +1,14 @@
-#include "test_suite_xdg.hpp"
 #include <wanda/xdg.hpp>
 
-#include "cute/cute.h"
+#include <cute/cute.h>
 
 #include <unistd.h>
 
 #include <filesystem>
+#include <string>
+#include <utility>
 
-namespace wanda
+namespace wanda::test
 {
 
 namespace
@@ -76,7 +77,7 @@ void test_xdg_path_for_runtime_dir_with_xdg_runtime_dir_in_environment()
     ASSERT_EQUAL("/home/cute/xdg_runtime_dir", xdg_path_for(xdg_directory::runtime_dir, env));
 }
 
-std::pair<cute::suite, std::string> test_suite_xdg()
+std::pair<cute::suite, std::string> suite()
 {
     return std::make_pair(cute::suite{
                               CUTE(test_xdg_variables),
