@@ -98,5 +98,4 @@ add_wanda_executable(NAME "wandac"
 add_wanda_test(NAME "xdg"
   LIBRARIES
   "wanda"
-  "LIB::CUTE"
 )

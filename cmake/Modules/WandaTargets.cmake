@@ -111,6 +111,7 @@ function(add_wanda_test)
 
   if(NOT TARGET "wanda_test_driver")
     add_library("wanda_test_driver" OBJECT "tests/wanda/driver.cpp")
+    target_link_libraries("wanda_test_driver" "LIB::CUTE")
   endif()
 
   add_executable("test_${WANDA_TEST_NAME}"
@@ -124,6 +125,7 @@ function(add_wanda_test)
   )
 
   target_link_libraries("test_${WANDA_TEST_NAME}"
+    "LIB::CUTE"
     ${WANDA_TEST_LIBRARIES}
   )
 
