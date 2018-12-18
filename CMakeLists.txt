@@ -58,6 +58,7 @@ add_wanda_library(NAME "wanda"
   LIBRARIES
   "CONAN_PKG::asio"
   "CONAN_PKG::spdlog"
+  "CONAN_PKG::range-v3"
   "SYSTEM::C++FS"
   "Threads::Threads"
 )

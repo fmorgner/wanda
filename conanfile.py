@@ -11,6 +11,7 @@ class Wanda(ConanFile):
     generators = "cmake"
     default_user = "fmorgner"
     default_channel = "stable"
+    build_policy = "missing"
     settings = (
         "os",
         "arch",
@@ -24,9 +25,9 @@ class Wanda(ConanFile):
     )
     requires = (
         "asio/1.12.0@bincrafters/stable",
-        "boost_iterator/1.67.0@bincrafters/stable",
         "clara/1.1.5@bincrafters/stable",
         "spdlog/1.2.1@bincrafters/stable",
+        "range-v3/0.4.0@ericniebler/stable",
     )
     default_options = {
         "asio:standalone": True,

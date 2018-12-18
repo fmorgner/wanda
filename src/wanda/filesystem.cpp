@@ -1,6 +1,7 @@
 #include <wanda/filesystem.hpp>
 
-#include <boost/iterator/filter_iterator.hpp>
+// #include <boost/iterator/filter_iterator.hpp>
+#include <range/v3/all.hpp>
 
 #include <random>
 
@@ -13,9 +14,9 @@ namespace wanda
       return std::nullopt;
     }
 
-    auto first = boost::make_filter_iterator(filter, std::filesystem::recursive_directory_iterator{source});
-    auto last = boost::make_filter_iterator(filter, std::filesystem::recursive_directory_iterator{});
-    return path_list{first, last};
+    auto begin = std::filesystem::recursive_directory_iterator{source};
+    auto end = std::filesystem::recursive_directory_iterator{};
+    return ranges::make_iterator_range(begin, end) | ranges::view::filter(filter);
   }
 
   std::filesystem::path random_pick(path_list const & paths)
