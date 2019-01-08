@@ -1,6 +1,5 @@
 #include <wanda/filesystem.hpp>
 
-// #include <boost/iterator/filter_iterator.hpp>
 #include <range/v3/all.hpp>
 
 #include <random>
