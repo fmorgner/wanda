@@ -28,75 +28,110 @@ if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 endif()
 
-include("ConanDependencies")
-include("SystemDependencies")
 include("CUTE")
-include("WandaTargets")
 
-add_wanda_library(NAME "wanda"
-  SOURCES
-  "command.cpp"
-  "control_connection.cpp"
-  "environment.cpp"
-  "logging.cpp"
-  "message.cpp"
-  "xdg.cpp"
+# Conan Dependencies
 
-  HEADERS
-  "command.hpp"
-  "control_connection.hpp"
-  "deferred_failure.hpp"
-  "environment.hpp"
-  "expected.hpp"
-  "keyed.hpp"
-  "logging.hpp"
-  "message.hpp"
-  "optional.hpp"
-  "type_wrapper.hpp"
-  "xdg.hpp"
+include("Conan")
 
-  LIBRARIES
+conan_add_remote(NAME "bincrafters"
+  URL "https://api.bintray.com/conan/bincrafters/public-conan"
+)
+conan_cmake_run(CONANFILE "conanfile.py"
+  BASIC_SETUP
+  CMAKE_TARGETS
+  BUILD "missing"
+  OUTPUT_QUIET
+)
+
+# System Dependencies
+
+set(CMAKE_THREAD_PREFER_PTHREAD ON)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+
+find_package("Threads")
+find_package("PkgConfig" REQUIRED)
+pkg_check_modules("GIO"
+  REQUIRED
+  IMPORTED_TARGET
+  GLOBAL
+  "gio-2.0"
+)
+
+find_library(C++FS_LIBRARIES
+  "stdc++fs"
+  DOC "The C++ Standard Library Filesystem implementation"
+)
+if(NOT C++FS_LIBRARIES)
+  message(FATAL_ERROR "Failed to find libstdc++fs")
+endif()
+
+# Core Library
+
+add_library("${PROJECT_NAME}" STATIC
+  "${PROJECT_SOURCE_DIR}/src/wanda/command.cpp"
+  "${PROJECT_SOURCE_DIR}/src/wanda/control_connection.cpp"
+  "${PROJECT_SOURCE_DIR}/src/wanda/environment.cpp"
+  "${PROJECT_SOURCE_DIR}/src/wanda/logging.cpp"
+  "${PROJECT_SOURCE_DIR}/src/wanda/message.cpp"
+  "${PROJECT_SOURCE_DIR}/src/wanda/xdg.cpp"
+
+  "${PROJECT_SOURCE_DIR}/include/wanda/command.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/control_connection.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/deferred_failure.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/environment.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/expected.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/keyed.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/logging.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/message.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/optional.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/type_wrapper.hpp"
+  "${PROJECT_SOURCE_DIR}/include/wanda/xdg.hpp"
+)
+target_link_libraries("${PROJECT_NAME}"
+  "${C++FS_LIBRARIES}"
   "CONAN_PKG::asio"
-  "CONAN_PKG::spdlog"
   "CONAN_PKG::range-v3"
-  "SYSTEM::C++FS"
+  "CONAN_PKG::spdlog"
   "Threads::Threads"
 )
+target_include_directories("${PROJECT_NAME}" SYSTEM
+  PUBLIC "${PROJECT_SOURCE_DIR}/include"
+)
 
-add_wanda_executable(NAME "wandad"
-  SOURCES
-  "control_interface.cpp"
-  "filesystem.cpp"
-  "setting.cpp"
-  "wallpaper.cpp"
-  "wandad.cpp"
+# Core Executables
 
-  HEADERS
-  "control_interface.hpp"
-  "filesystem.hpp"
-  "setting.hpp"
-  "wallpaper.hpp"
+add_executable("${PROJECT_NAME}d"
+  "${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/control_interface.cpp"
+  "${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/filesystem.cpp"
+  "${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/setting.cpp"
+  "${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/wallpaper.cpp"
+  "${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/wandad.cpp"
 
-  LIBRARIES
-  "wanda"
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/control_interface.hpp"
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/filesystem.hpp"
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/setting.hpp"
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/wallpaper.hpp"
+)
+target_link_libraries("${PROJECT_NAME}d"
+  "${PROJECT_NAME}"
   "CONAN_PKG::clara"
-  "SYSTEM::GIO"
+  "PkgConfig::GIO"
 )
 
-add_wanda_executable(NAME "wandac"
-  SOURCES
-  "commander.cpp"
-  "wandac.cpp"
+add_executable("${PROJECT_NAME}c"
+  "${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/commander.cpp"
+  "${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/wandac.cpp"
 
-  HEADERS
-  "commander.hpp"
-
-  LIBRARIES
-  "wanda"
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/commander.hpp"
+)
+target_link_libraries("${PROJECT_NAME}c"
+  "${PROJECT_NAME}"
   "CONAN_PKG::clara"
 )
 
-add_wanda_test(NAME "xdg"
-  LIBRARIES
-  "wanda"
-)
+# Automated Tests
+
+if(CUTE_FOUND)
+  cute_test("xdg")
+endif()
