@@ -103,10 +103,6 @@ namespace wanda
                   std::transform(value.begin(), value.end(), temp.begin(), [](auto const & str) { return str.c_str(); });
                   return g_settings_set_strv(setting, key, temp.data());
                 }
-                else
-                {
-                  static_assert(deferred_failure<Type>{}, "Invalid argument type!");
-                }
               }()}
           {
           }
