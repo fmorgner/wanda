@@ -51,8 +51,9 @@ struct cli
 
 struct listener : wanda::commander::listener
 {
-  listener(::cli & cli)
+  listener(::cli & cli, asio::io_service & service)
       : m_cli{cli}
+      , m_service{service}
   {
   }
 
@@ -61,12 +62,15 @@ struct listener : wanda::commander::listener
     if (m_cli.command == "change")
     {
       commander.send(wanda::make_change_command());
-      commander.stop();
+      m_service.post([&]{
+        commander.stop();
+      });
     }
   }
 
 private:
   ::cli & m_cli;
+  asio::io_service & m_service;
 };
 
 int main(int argc, char const * const * argv)
@@ -86,7 +90,7 @@ int main(int argc, char const * const * argv)
 
   auto interface = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, wanda::environment{}) / ".wanda_interface";
   auto service = asio::io_service{};
-  auto listener = ::listener{cli};
+  auto listener = ::listener{cli, service};
 
   auto commander = wanda::commander{service, interface, listener};
 
