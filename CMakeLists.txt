@@ -135,3 +135,7 @@ target_link_libraries("${PROJECT_NAME}c"
 if(CUTE_FOUND)
   cute_test("xdg")
 endif()
+
+# Install Targets
+
+install(TARGETS "${PROJECT_NAME}" "${PROJECT_NAME}c" "${PROJECT_NAME}d")
