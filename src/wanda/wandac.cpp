@@ -5,7 +5,7 @@
 #include <wanda/xdg.hpp>
 
 #include <asio.hpp>
-#include <clara.hpp>
+#include <lyra/lyra.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
@@ -19,14 +19,14 @@ struct cli
   std::string command{};
   bool help{};
 
-  clara::Parser parser;
+  lyra::cli_parser parser{};
 
   auto parse(int argc, char const * const * argv, std::ostream & error)
   {
-    parser = clara::Arg{command, "command"}("The command to send to the deamon").required() |
-             clara::Help(help);
+    parser |= lyra::arg{command, "command"}("The command to send to the deamon").required() |
+              lyra::help(help);
 
-    auto result = parser.parse(clara::Args{argc, argv});
+    auto result = parser.parse({argc, argv});
 
     if (!result)
     {

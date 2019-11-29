@@ -115,7 +115,7 @@ add_executable("${PROJECT_NAME}d"
 )
 target_link_libraries("${PROJECT_NAME}d"
   "${PROJECT_NAME}"
-  "CONAN_PKG::clara"
+  "CONAN_PKG::lyra"
   "PkgConfig::GIO"
 )
 
@@ -127,7 +127,7 @@ add_executable("${PROJECT_NAME}c"
 )
 target_link_libraries("${PROJECT_NAME}c"
   "${PROJECT_NAME}"
-  "CONAN_PKG::clara"
+  "CONAN_PKG::lyra"
 )
 
 # Automated Tests

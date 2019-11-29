@@ -26,7 +26,7 @@ class Wanda(ConanFile):
     )
     requires = (
         "asio/1.12.2",
-        "clara/1.1.5@bincrafters/stable",
+        "lyra/1.2.0",
         "CUTE/2.2.6@fmorgner/stable",
         "spdlog/1.4.2",
         "range-v3/0.4.0@ericniebler/stable",
