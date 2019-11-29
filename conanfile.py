@@ -2,6 +2,7 @@
 
 from conans import ConanFile, CMake
 
+
 class Wanda(ConanFile):
     name = "wanda"
     version = "1.0.0"
@@ -24,15 +25,12 @@ class Wanda(ConanFile):
         "src/*",
     )
     requires = (
-        "asio/1.12.0@bincrafters/stable",
+        "asio/1.12.2",
         "clara/1.1.5@bincrafters/stable",
-        "spdlog/1.2.1@bincrafters/stable",
-        "range-v3/0.4.0@ericniebler/stable",
         "CUTE/2.2.6@fmorgner/stable",
+        "spdlog/1.4.1",
+        "range-v3/0.4.0@ericniebler/stable",
     )
-    default_options = {
-        "asio:standalone": True,
-    }
 
     def configure_cmake(self):
         cmake = CMake(self)
