@@ -31,7 +31,6 @@ class Wanda(ConanFile):
     )
     default_options = {
         "asio:standalone": True,
-        "spdlog:fmt_external": False,
     }
 
     def configure_cmake(self):
