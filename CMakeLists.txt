@@ -28,7 +28,7 @@ if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 endif()
 
-include("CUTE")
+enable_testing()
 
 # Conan Dependencies
 
@@ -36,6 +36,9 @@ include("Conan")
 
 conan_add_remote(NAME "bincrafters"
   URL "https://api.bintray.com/conan/bincrafters/public-conan"
+)
+conan_add_remote(NAME "bincrafters"
+  URL "https://api.bintray.com/conan/fmorgner/conan-public"
 )
 conan_cmake_run(CONANFILE "conanfile.py"
   BASIC_SETUP
@@ -132,9 +135,31 @@ target_link_libraries("${PROJECT_NAME}c"
 
 # Automated Tests
 
-if(CUTE_FOUND)
-  cute_test("xdg")
-endif()
+add_library("${PROJECT_NAME}_test_driver" OBJECT
+  "tests/${PROJECT_NAME}/driver.cpp"
+)
+target_link_libraries("${PROJECT_NAME}_test_driver"
+  "CONAN_PKG::CUTE"
+)
+
+function("cute_test" SUITE_NAME)
+  if(NOT SUITE_NAME)
+    message(FATAL_ERROR "Missing argument 'SUITE_NAME'!")
+  endif()
+
+  add_executable("${PROJECT_NAME}_${SUITE_NAME}_tests"
+    "tests/${PROJECT_NAME}/test_suite_${SUITE_NAME}.cpp"
+  )
+  target_link_libraries("${PROJECT_NAME}_${SUITE_NAME}_tests"
+    "${PROJECT_NAME}_test_driver"
+    "${PROJECT_NAME}"
+  )
+  add_test(NAME "${SUITE_NAME}_tests"
+    COMMAND "${PROJECT_NAME}_${SUITE_NAME}_tests"
+  )
+endfunction()
+
+cute_test("xdg")
 
 # Install Targets
 
