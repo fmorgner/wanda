@@ -37,13 +37,6 @@ struct cli
             << '\n';
       return false;
     }
-    else if (command.empty())
-    {
-      error << "Missing required argument 'command'\n"
-            << parser
-            << '\n';
-      return false;
-    }
 
     return true;
   }
