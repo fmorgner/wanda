@@ -9,9 +9,12 @@
 #include <wanda/xdg.hpp>
 
 #include <asio.hpp>
+#include <lyra/lyra.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <csignal>
+#include <cstdlib>
+#include <iostream>
 #include <set>
 #include <string>
 
@@ -31,6 +34,34 @@ namespace
     return extensions.find(path.extension()) != extensions.cend();
   };
 
+  struct cli
+  {
+    std::string wallpaper_directory{};
+    bool help{};
+
+    lyra::cli_parser parser{};
+
+    auto parse(int argc, char const * const * argv, std::ostream & error)
+    {
+      parser |= lyra::arg{wallpaper_directory, "directory"}("The wallpaper source directory").required() |
+                lyra::help(help);
+
+      auto result = parser.parse({argc, argv});
+
+      if (!result)
+      {
+        error << "Error while processing command line arguments: "
+              << result.errorMessage()
+              << '\n'
+              << parser
+              << '\n';
+        return false;
+      }
+
+      return true;
+    }
+  };
+
   struct listener : wanda::control_interface::listener
   {
     listener(std::vector<std::filesystem::path> const & wallpapers)
@@ -42,8 +73,7 @@ namespace
     {
       switch (command.id)
       {
-        case wanda::command_id::change:
-        {
+        case wanda::command_id::change: {
           auto wallpaper = wanda::random_pick(m_wallpapers);
           wanda::get_logger()->info("changing wallpaper to '{}'", wallpaper.native());
           wanda::set_wallpaper(wallpaper);
@@ -60,14 +90,25 @@ namespace
 
 }  // namespace
 
-int main()
+int main(int argc, char const * const * argv)
 {
   using namespace wanda::std_ext;
+
+  auto cli = ::cli{};
+  if (!cli.parse(argc, argv, std::cerr))
+  {
+    return EXIT_FAILURE;
+  }
+  else if (cli.help)
+  {
+    std::cout << cli.parser << '\n';
+    return EXIT_SUCCESS;
+  }
 
   wanda::initialize_logger(std::make_shared<spdlog::sinks::stdout_color_sink_st>());
   wanda::get_logger()->info("wanda is starting up");
 
-  with(wanda::scan({"/usr/share/backgrounds"}, image_filter), [&](auto const & list) {
+  with(wanda::scan({cli.wallpaper_directory}, image_filter), [&](auto const & list) {
     auto service = asio::io_service{};
     auto socket_path = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, wanda::environment{}) / ".wanda_interface";
 
@@ -99,5 +140,6 @@ int main()
     wanda::set_wallpaper(wallpaper);
 
     service.run();
-  }) || [&] { wanda::get_logger()->error("wallpaper directory does not exist"); };
+  }) ||
+      [&] { wanda::get_logger()->error("wallpaper directory does not exist"); };
 }
