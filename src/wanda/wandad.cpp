@@ -127,10 +127,11 @@ int main(int argc, char const * const * argv)
       return;
     }
 
-    auto signals = asio::signal_set{service, SIGINT};
+    auto signals = asio::signal_set{service, SIGINT, SIGTERM};
     signals.async_wait([&](auto const & error, auto const signal) {
-      if (!error && signal == SIGINT)
+      if (!error)
       {
+        wanda::get_logger()->info("Received signal {}. terminating...", signal);
         interface->shutdown();
         service.stop();
       }
