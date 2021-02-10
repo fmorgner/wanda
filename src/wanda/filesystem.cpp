@@ -1,8 +1,7 @@
 #include <wanda/filesystem.hpp>
 
-#include <range/v3/all.hpp>
-
 #include <random>
+#include <ranges>
 
 namespace wanda
 {
@@ -12,10 +11,13 @@ namespace wanda
     {
       return std::nullopt;
     }
-
-    auto begin = std::filesystem::recursive_directory_iterator{source};
-    auto end = std::filesystem::recursive_directory_iterator{};
-    return ranges::make_iterator_range(begin, end) | ranges::view::filter(filter);
+    auto entries = std::filesystem::recursive_directory_iterator{source};
+    auto result = path_list{};
+    for (auto & entry : entries | std::views::filter(filter))
+    {
+      result.push_back(entry.path());
+    }
+    return result;
   }
 
   std::filesystem::path random_pick(path_list const & paths)

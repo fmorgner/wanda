@@ -4,7 +4,7 @@ project("wanda" LANGUAGES CXX)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD "17")
+set(CMAKE_CXX_STANDARD "20")
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
@@ -91,7 +91,6 @@ add_library("${PROJECT_NAME}" STATIC
 target_link_libraries("${PROJECT_NAME}"
   "${C++FS_LIBRARIES}"
   "CONAN_PKG::asio"
-  "CONAN_PKG::range-v3"
   "CONAN_PKG::spdlog"
   "Threads::Threads"
 )
