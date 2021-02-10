@@ -58,6 +58,13 @@ pkg_check_modules("GIO"
   "gio-2.0"
 )
 
+pkg_check_modules("libmagic"
+  REQUIRED
+  IMPORTED_TARGET
+  GLOBAL
+  "libmagic"
+)
+
 find_library(C++FS_LIBRARIES
   "stdc++fs"
   DOC "The C++ Standard Library Filesystem implementation"
@@ -115,7 +122,11 @@ add_executable("${PROJECT_NAME}d"
 target_link_libraries("${PROJECT_NAME}d"
   "${PROJECT_NAME}"
   "CONAN_PKG::lyra"
+  "CONAN_PKG::boost"
+  "CONAN_PKG::libjpeg"
+  "CONAN_PKG::libpng"
   "PkgConfig::GIO"
+  "PkgConfig::libmagic"
 )
 
 add_executable("${PROJECT_NAME}c"

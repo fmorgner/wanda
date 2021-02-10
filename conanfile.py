@@ -29,6 +29,9 @@ class Wanda(ConanFile):
         "lyra/1.5.1",
         "CUTE/2.2.6@fmorgner/stable",
         "spdlog/1.4.2",
+        "boost/1.75.0",
+        "libpng/1.6.37",
+        "libjpeg/9d",
     )
 
     def configure_cmake(self):
