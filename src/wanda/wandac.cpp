@@ -31,7 +31,7 @@ struct cli
     if (!result)
     {
       error << "Error while processing command line arguments: "
-            << result.errorMessage()
+            << result.message()
             << '\n'
             << parser
             << '\n';

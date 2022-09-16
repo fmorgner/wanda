@@ -1,21 +1,4 @@
 {
-    "C_Cpp.default.configurationProvider": "go2sh.cmake-integration",
-    "C_Cpp.default.cppStandard": "c++17",
-    "C_Cpp.configurationWarnings": "Disabled",
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.clang_format_style": "file",
-
-    "cmake.cpptools.guessSourceFileConfigurations": true,
-    "cmake.cpptools.languageConfiguration.CXX": {
-        "intelliSenseMode": "gcc-x64",
-    },
-    "cmake.configureArguments": "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
-    "cmake.buildArguments": "--parallel",
-    "cmake.default.cacheEntries": [
-        {
-            "name": "CMAKE_INSTALL_PREFIX",
-            "type": "PATH",
-            "value": "${env:HOME}/.local"
-        }
-    ]
 }

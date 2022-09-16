@@ -2,21 +2,36 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "install",
+            "label": "conan: install",
             "type": "shell",
-            "command": "cmake",
+            "command": "conan",
             "args": [
-                "--build",
-                "${workspaceFolder}/build",
-                "--target",
                 "install",
-                "--parallel"
+                "-if",
+                "build",
+                "-pr:b=default",
+                "-pr:h=default",
+                "-b",
+                "missing",
+                "."
             ],
-            "group": "build",
-            "presentation": {
-                "reveal": "silent"
+        },
+        {
+            "label": "conan: build",
+            "type": "shell",
+            "command": "conan",
+            "args": [
+                "build",
+                "-if",
+                "build",
+                "."
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
             },
-            "problemMatcher": "$gcc"
+            "problemMatcher": "$gcc",
+            "dependsOn": "conan: install"
         }
     ]
 }

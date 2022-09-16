@@ -1,6 +1,5 @@
-# pylint:  disable=missing-docstring
-
-from conans import ConanFile, CMake
+from conans import ConanFile
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 
 
 class Wanda(ConanFile):
@@ -9,10 +8,10 @@ class Wanda(ConanFile):
     url = "https://github.com/fmorgner/wanda"
     license = "BSD 3-clause"
     description = "A wallpaper changer for the GNOME"
-    generators = "cmake"
-    default_user = "fmorgner"
-    default_channel = "stable"
-    build_policy = "missing"
+    generators = (
+        "CMakeDeps",
+        "virtualenv",
+    )
     settings = (
         "os",
         "arch",
@@ -21,30 +20,38 @@ class Wanda(ConanFile):
     )
     exports_sources = (
         "CMakeLists.txt",
-        "cmake/*",
         "src/*",
+        "include/*",
+        "lib/*",
+        "test/*"
     )
     requires = (
-        "asio/1.18.1",
-        "lyra/1.5.1",
-        "CUTE/2.2.6@fmorgner/stable",
-        "spdlog/1.4.2",
-        "boost/1.75.0",
-        "libpng/1.6.37",
+        "asio/[~=1.24.0]",
+        "boost/[~=1.80.0]",
         "libjpeg/9d",
+        "libpng/[~=1.6.0]",
+        "lyra/[~=1.6.0]",
+        "spdlog/[~=1.10.0]",
+    )
+    tool_requires = (
+        "cmake/[~=3.24]",
     )
 
-    def configure_cmake(self):
+    def build(self):
         cmake = CMake(self)
         cmake.configure()
-        return cmake
-
-    def build(self):
-        cmake = self.configure_cmake()
         cmake.build()
 
+    def generate(self):
+        toolchain = CMakeToolchain(self)
+        toolchain.variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = True
+        toolchain.generate()
+
+    def layout(self):
+        cmake_layout(self, src_folder=".")
+
     def package(self):
-        cmake = self.configure_cmake()
+        cmake = CMake(self)
         cmake.install()
 
     def package_info(self):
