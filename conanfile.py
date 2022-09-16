@@ -48,7 +48,7 @@ class Wanda(ConanFile):
         toolchain.generate()
 
     def layout(self):
-        cmake_layout(self, src_folder=".")
+        cmake_layout(self, src_folder="source")
 
     def package(self):
         cmake = CMake(self)

@@ -1,4 +1,3 @@
 /.mypy_cache
 /.virtualenv
 /build
-/CMakeUserPresets.json
