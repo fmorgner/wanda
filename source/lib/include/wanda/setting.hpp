@@ -7,8 +7,8 @@
 #ifndef WANDA_setting_HPP
 #define WANDA_setting_HPP
 
-#include <wanda/deferred_failure.hpp>
-#include <wanda/type_wrapper.hpp>
+#include "wanda/deferred_failure.hpp"
+#include "wanda/type_wrapper.hpp"
 
 #include <gio/gio.h>
 

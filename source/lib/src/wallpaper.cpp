@@ -1,8 +1,8 @@
-#include <wanda/logging.hpp>
-#include <wanda/magic.hpp>
-#include <wanda/optional.hpp>
-#include <wanda/setting.hpp>
-#include <wanda/wallpaper.hpp>
+#include "wanda/logging.hpp"
+#include "wanda/magic.hpp"
+#include "wanda/optional.hpp"
+#include "wanda/setting.hpp"
+#include "wanda/wallpaper.hpp"
 
 #include <boost/gil.hpp>
 #include <boost/gil/extension/io/jpeg.hpp>
@@ -37,13 +37,6 @@ namespace wanda
       }
 
       return image;
-
-      // // auto source_view = ;
-
-      // return fmt::format("#{:02X}{:02X}{:02X}",
-      //                    static_cast<uint8_t>(std::sqrt((at_c<0>(pixel64) / image.size()))),
-      //                    static_cast<uint8_t>(std::sqrt((at_c<1>(pixel64) / image.size()))),
-      //                    static_cast<uint8_t>(std::sqrt((at_c<2>(pixel64) / image.size()))));
     }
 
     auto average_colors(boost::gil::rgb8_image_t image)
@@ -64,7 +57,6 @@ namespace wanda
       return accumulator;
     }
 
-    //
   }  // namespace
 
   void set_wallpaper(std::filesystem::path wallpaper)

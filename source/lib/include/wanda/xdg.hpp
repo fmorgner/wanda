@@ -7,7 +7,7 @@
 #ifndef WANDA_XDG_HPP
 #define WANDA_XDG_HPP
 
-#include <wanda/environment.hpp>
+#include "wanda/environment.hpp"
 
 #include <cstddef>
 #include <filesystem>

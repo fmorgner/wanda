@@ -7,9 +7,9 @@
 #ifndef WANDA_CONTROL_INTERFACE_HPP
 #define WANDA_CONTROL_INTERFACE_HPP
 
-#include <wanda/command.hpp>
-#include <wanda/control_connection.hpp>
-#include <wanda/keyed.hpp>
+#include "wanda/command.hpp"
+#include "wanda/control_connection.hpp"
+#include "wanda/keyed.hpp"
 
 #include <asio.hpp>
 #include <spdlog/spdlog.h>

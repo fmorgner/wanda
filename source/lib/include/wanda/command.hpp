@@ -1,7 +1,7 @@
 #ifndef WANDA_COMMAND_HPP
 #define WANDA_COMMAND_HPP
 
-#include <wanda/message.hpp>
+#include "wanda/message.hpp"
 
 #include <optional>
 #include <string>

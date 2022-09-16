@@ -1,3 +1,5 @@
+import os
+
 from conans import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 
@@ -8,10 +10,16 @@ class Wanda(ConanFile):
     url = "https://github.com/fmorgner/wanda"
     license = "BSD 3-clause"
     description = "A wallpaper changer for the GNOME"
+    scm = {
+        "type": "git",
+        "url": "auto",
+        "revision": "auto",
+    }
     generators = (
         "CMakeDeps",
-        "virtualenv",
     )
+    options = {"shared": [True, False]}
+    default_options = {"shared": False}
     settings = (
         "os",
         "arch",
@@ -19,11 +27,7 @@ class Wanda(ConanFile):
         "build_type",
     )
     exports_sources = (
-        "CMakeLists.txt",
-        "src/*",
-        "include/*",
-        "lib/*",
-        "test/*"
+        "source/*",
     )
     requires = (
         "asio/[~=1.24.0]",
@@ -56,3 +60,4 @@ class Wanda(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["wanda"]
+        self.env_info.PATH.append(os.path.join(self.package_folder, "bin"))

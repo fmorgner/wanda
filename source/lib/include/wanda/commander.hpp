@@ -1,9 +1,9 @@
 #ifndef WANDA_COMMANDER_HPP
 #define WANDA_COMMANDER_HPP
 
-#include <wanda/command.hpp>
-#include <wanda/control_connection.hpp>
-#include <wanda/message.hpp>
+#include "wanda/command.hpp"
+#include "wanda/control_connection.hpp"
+#include "wanda/message.hpp"
 
 #include <asio.hpp>
 
