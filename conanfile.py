@@ -1,6 +1,6 @@
 import os
 
-from conans import ConanFile
+from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 
 
@@ -30,15 +30,15 @@ class Wanda(ConanFile):
         "source/*",
     )
     requires = (
-        "asio/[~=1.24.0]",
-        "boost/[~=1.80.0]",
+        "asio/[~1.24.0]",
+        "boost/[~1.80.0]",
         "libjpeg/9d",
-        "libpng/[~=1.6.0]",
-        "lyra/[~=1.6.0]",
-        "spdlog/[~=1.10.0]",
+        "libpng/[~1.6.0]",
+        "lyra/[~1.6.0]",
+        "spdlog/[~1.10.0]",
     )
     tool_requires = (
-        "cmake/[~=3.24]",
+        "cmake/[~3.26]",
     )
 
     def build(self):
@@ -60,4 +60,3 @@ class Wanda(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["wanda"]
-        self.env_info.PATH.append(os.path.join(self.package_folder, "bin"))
