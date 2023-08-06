@@ -30,15 +30,15 @@ class Wanda(ConanFile):
         "source/*",
     )
     requires = (
-        "asio/[~1.24.0]",
-        "boost/[~1.80.0]",
-        "libjpeg/9d",
+        "asio/[~1.28.0]",
+        "boost/[~1.82.0]",
+        "libjpeg/9e",
         "libpng/[~1.6.0]",
         "lyra/[~1.6.0]",
-        "spdlog/[~1.10.0]",
+        "spdlog/[~1.12.0]",
     )
     tool_requires = (
-        "cmake/[~3.26]",
+        "cmake/[~3.27]",
     )
 
     def build(self):

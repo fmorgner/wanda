@@ -11,6 +11,7 @@
 #include <istream>
 #include <optional>
 #include <string>
+#include <fmt/core.h>
 
 namespace wanda
 {
@@ -79,5 +80,14 @@ namespace wanda
   std::ostream & operator<<(std::ostream & out, message const & message);
 
 }  // namespace wanda
+
+template<>
+struct fmt::formatter<wanda::message> : fmt::formatter<std::string>
+{
+  auto format(wanda::message const & message, format_context & context) const
+  {
+    return formatter<string_view>::format(static_cast<std::string>(message), context);
+  }
+};
 
 #endif

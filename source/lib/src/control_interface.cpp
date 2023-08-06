@@ -75,7 +75,7 @@ namespace wanda
     m_acceptor.async_accept(m_socket, [that = shared_from_this(), this](auto const & error) {
       if (error && error != asio::error::operation_aborted)
       {
-        get_logger()->error("failed to accept connection because '{}'", error);
+        get_logger()->error("failed to accept connection because '{}'", error.message());
       }
       else
       {
