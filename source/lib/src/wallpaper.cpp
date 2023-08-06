@@ -80,6 +80,10 @@ namespace wanda
         value = "file://" + wallpaper.native();
       }) ||
           [&] { get_logger()->error("invalid settings key"); };
+      with(setting["picture-uri-dark"_key], [&](auto & value) {
+        value = "file://" + wallpaper.native();
+      }) ||
+          [&] { get_logger()->error("invalid settings key"); };
     }) ||
         [&] { get_logger()->error("invalid setting"); };
   }
