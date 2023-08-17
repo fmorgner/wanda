@@ -2,26 +2,9 @@ include("CheckIPOSupported")
 
 check_ipo_supported(RESULT "WANDA_IPO_SUPPORTED")
 
+find_package("asio")
 find_package("lyra")
-
-#[=====[ Server ]=====]
-
-add_executable("wandad"
-  "src/wandad.cpp"
-)
-
-target_link_libraries("wandad" PRIVATE
-  "bfg::lyra"
-  "wanda::wanda"
-)
-
-set_target_properties("wandad" PROPERTIES
-  CXX_STANDARD_REQUIRED YES
-  CXX_EXTENSIONS OFF
-  INTERPROCEDURAL_OPTIMIZATION ${WANDA_IPO_SUPPORTED}
-)
-
-install(TARGETS "wandad")
+find_package("spdlog")
 
 #[=====[ Client ]=====]
 
@@ -30,8 +13,13 @@ add_executable("wandac"
 )
 
 target_link_libraries("${PROJECT_NAME}c" PRIVATE
+  "wanda::control"
+  "wanda::proto"
+  "wanda::system"
+
+  "asio::asio"
   "bfg::lyra"
-  "wanda::wanda"
+  "spdlog::spdlog"
 )
 
 set_target_properties("wandac" PROPERTIES
@@ -41,3 +29,28 @@ set_target_properties("wandac" PROPERTIES
 )
 
 install(TARGETS "wandac")
+
+#[=====[ Server ]=====]
+
+add_executable("wandad"
+  "src/wandad.cpp"
+)
+
+target_link_libraries("wandad" PRIVATE
+  "wanda::control"
+  "wanda::proto"
+  "wanda::std_ext"
+  "wanda::system"
+
+  "asio::asio"
+  "bfg::lyra"
+  "spdlog::spdlog"
+)
+
+set_target_properties("wandad" PROPERTIES
+  CXX_STANDARD_REQUIRED YES
+  CXX_EXTENSIONS OFF
+  INTERPROCEDURAL_OPTIMIZATION ${WANDA_IPO_SUPPORTED}
+)
+
+install(TARGETS "wandad")

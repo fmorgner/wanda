@@ -1,3 +1,10 @@
+/.cache
 /.mypy_cache
 /.virtualenv
+/.vscode/.conan_tools
+
 /build
+/test_package/build
+
+CMakeUserPresets.json
+compile_commands.json

@@ -1,8 +1,8 @@
-#include <wanda/command.hpp>
-#include <wanda/commander.hpp>
-#include <wanda/environment.hpp>
-#include <wanda/logging.hpp>
-#include <wanda/xdg.hpp>
+#include <wanda/control/commander.hpp>
+#include <wanda/proto/command.hpp>
+#include <wanda/system/environment.hpp>
+#include <wanda/system/logging.hpp>
+#include <wanda/system/xdg.hpp>
 
 #include <asio.hpp>
 #include <lyra/lyra.hpp>
@@ -23,18 +23,13 @@ struct cli
 
   auto parse(int argc, char const * const * argv, std::ostream & error)
   {
-    parser |= lyra::arg{command, "command"}("The command to send to the deamon").required() |
-              lyra::help(help);
+    parser |= lyra::arg{command, "command"}("The command to send to the deamon").required() | lyra::help(help);
 
     auto result = parser.parse({argc, argv});
 
     if (!result)
     {
-      error << "Error while processing command line arguments: "
-            << result.message()
-            << '\n'
-            << parser
-            << '\n';
+      error << "Error while processing command line arguments: " << result.message() << '\n' << parser << '\n';
       return false;
     }
 
@@ -42,7 +37,7 @@ struct cli
   }
 };
 
-struct listener : wanda::commander::listener
+struct listener : wanda::control::commander::listener
 {
   listener(::cli & cli, asio::io_service & service)
       : m_cli{cli}
@@ -50,14 +45,12 @@ struct listener : wanda::commander::listener
   {
   }
 
-  void on_connected(wanda::commander & commander) override
+  void on_connected(wanda::control::commander & commander) override
   {
     if (m_cli.command == "change")
     {
-      commander.send(wanda::make_change_command());
-      m_service.post([&]{
-        commander.stop();
-      });
+      commander.send(wanda::proto::make_change_command());
+      m_service.post([&] { commander.stop(); });
     }
   }
 
@@ -79,15 +72,17 @@ int main(int argc, char const * const * argv)
     return EXIT_SUCCESS;
   }
 
-  wanda::initialize_logger(std::make_shared<spdlog::sinks::stderr_color_sink_st>());
+  wanda::system::initialize_logger(std::make_shared<spdlog::sinks::stderr_color_sink_st>());
 
-  auto interface = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, wanda::environment{}) / ".wanda_interface";
+  auto interface =
+      wanda::system::xdg_path_for(wanda::system::xdg_directory::runtime_dir, wanda::system::environment{}) /
+      ".wanda_interface";
   auto service = asio::io_service{};
   auto listener = ::listener{cli, service};
 
-  auto commander = wanda::commander{service, interface, listener};
+  auto commander = wanda::control::commander{service, interface, listener};
 
-  wanda::get_logger()->info("trying to connect to wanda control interface on '{}'", interface.native());
+  wanda::system::get_logger()->info("trying to connect to wanda control interface on '{}'", interface.native());
   commander.start();
 
   service.run();

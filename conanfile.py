@@ -15,9 +15,7 @@ class Wanda(ConanFile):
         "url": "auto",
         "revision": "auto",
     }
-    generators = (
-        "CMakeDeps",
-    )
+    generators = ("CMakeDeps",)
     options = {"shared": [True, False]}
     default_options = {"shared": False}
     settings = (
@@ -26,20 +24,17 @@ class Wanda(ConanFile):
         "compiler",
         "build_type",
     )
-    exports_sources = (
-        "source/*",
-    )
+    exports_sources = ("source/*",)
     requires = (
         "asio/[~1.28]",
         "boost/[~1.82]",
+        "fmt/[~10.0]",
         "libjpeg/9e",
         "libpng/[~1.6]",
         "lyra/[~1.6]",
         "spdlog/[~1.12]",
     )
-    tool_requires = (
-        "cmake/[>=3.27]",
-    )
+    tool_requires = ("cmake/[>=3.27]",)
 
     def build(self):
         cmake = CMake(self)
@@ -59,4 +54,65 @@ class Wanda(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["wanda"]
+        self.cpp_info.components["control"].libs = ["wanda-control"]
+        self.cpp_info.components["control"].requires = [
+            "meta",
+            "proto",
+            "std_ext",
+            "system",
+            # requires
+            "asio::asio",
+            "spdlog::spdlog",
+        ]
+
+        self.cpp_info.components["meta"].libs = []
+
+        self.cpp_info.components["proto"].libs = ["wanda-proto"]
+        self.cpp_info.components["proto"].requires = ["fmt::fmt"]
+
+        self.cpp_info.components["std_ext"].libs = []
+
+        self.cpp_info.components["system"].libs = ["wanda-system"]
+        self.cpp_info.components["system"].requires = [
+            "meta",
+            "std_ext",
+            # requires
+            "boost::boost",
+            "fmt::fmt",
+            "libjpeg::libjpeg",
+            "libpng::libpng",
+            "spdlog::spdlog",
+        ]
+        self.cpp_info.components["system"].system_libs = [
+            "glib2",
+            "magic",
+        ]
+
+        self.cpp_info.components["wandac"].libs = []
+        self.cpp_info.components["wandac"].requires = [
+            "control",
+            "proto",
+            "system",
+            # requires
+            "asio::asio",
+            "lyra::lyra",
+            "spdlog::spdlog",
+        ]
+        self.cpp_info.components["wandac"].bindirs = [
+            os.path.join(self.package_folder, "bin")
+        ]
+
+        self.cpp_info.components["wandad"].libs = []
+        self.cpp_info.components["wandad"].requires = [
+            "control",
+            "proto",
+            "std_ext",
+            "system",
+            # requires
+            "asio::asio",
+            "lyra::lyra",
+            "spdlog::spdlog",
+        ]
+        self.cpp_info.components["wandad"].bindirs = [
+            os.path.join(self.package_folder, "bin")
+        ]

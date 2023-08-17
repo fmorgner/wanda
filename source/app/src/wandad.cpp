@@ -1,12 +1,12 @@
-#include <wanda/command.hpp>
-#include <wanda/control_interface.hpp>
-#include <wanda/environment.hpp>
-#include <wanda/filesystem.hpp>
-#include <wanda/logging.hpp>
-#include <wanda/optional.hpp>
-#include <wanda/setting.hpp>
-#include <wanda/wallpaper.hpp>
-#include <wanda/xdg.hpp>
+#include <wanda/control/interface.hpp>
+#include <wanda/proto/command.hpp>
+#include <wanda/std_ext/optional.hpp>
+#include <wanda/system/environment.hpp>
+#include <wanda/system/filesystem.hpp>
+#include <wanda/system/logging.hpp>
+#include <wanda/system/setting.hpp>
+#include <wanda/system/wallpaper.hpp>
+#include <wanda/system/xdg.hpp>
 
 #include <asio.hpp>
 #include <lyra/lyra.hpp>
@@ -43,18 +43,14 @@ namespace
 
     auto parse(int argc, char const * const * argv, std::ostream & error)
     {
-      parser |= lyra::arg{wallpaper_directory, "directory"}("The wallpaper source directory").required() |
-                lyra::help(help);
+      parser |=
+          lyra::arg{wallpaper_directory, "directory"}("The wallpaper source directory").required() | lyra::help(help);
 
       auto result = parser.parse({argc, argv});
 
       if (!result)
       {
-        error << "Error while processing command line arguments: "
-              << result.message()
-              << '\n'
-              << parser
-              << '\n';
+        error << "Error while processing command line arguments: " << result.message() << '\n' << parser << '\n';
         return false;
       }
 
@@ -62,25 +58,25 @@ namespace
     }
   };
 
-  struct listener : wanda::control_interface::listener
+  struct listener : wanda::control::interface::listener
   {
     listener(std::vector<std::filesystem::path> const & wallpapers)
         : m_wallpapers{wallpapers}
     {
     }
 
-    void on_received(wanda::control_interface & interface, wanda::command command) override
+    void on_received(wanda::control::interface & interface, wanda::proto::command command) override
     {
       switch (command.id)
       {
-        case wanda::command_id::change: {
-          auto wallpaper = wanda::random_pick(m_wallpapers);
-          wanda::get_logger()->info("changing wallpaper to '{}'", wallpaper.native());
-          wanda::set_wallpaper(wallpaper);
+        case wanda::proto::command_id::change: {
+          auto wallpaper = wanda::system::random_pick(m_wallpapers);
+          wanda::system::get_logger()->info("changing wallpaper to '{}'", wallpaper.native());
+          wanda::system::set_wallpaper(wallpaper);
           break;
         }
         default:
-          wanda::get_logger()->error("received unknown command '{}'", static_cast<int>(command.id));
+          wanda::system::get_logger()->error("received unknown command '{}'", static_cast<int>(command.id));
       }
     }
 
@@ -105,42 +101,45 @@ int main(int argc, char const * const * argv)
     return EXIT_SUCCESS;
   }
 
-  wanda::initialize_logger(std::make_shared<spdlog::sinks::stdout_color_sink_st>());
-  wanda::get_logger()->info("wanda is starting up");
+  wanda::system::initialize_logger(std::make_shared<spdlog::sinks::stdout_color_sink_st>());
+  wanda::system::get_logger()->info("wanda is starting up");
 
-  with(wanda::scan({cli.wallpaper_directory}, image_filter), [&](auto const & list) {
-    auto service = asio::io_service{};
-    auto socket_path = wanda::xdg_path_for(wanda::xdg_directory::runtime_dir, wanda::environment{}) / ".wanda_interface";
+  with(wanda::system::scan({cli.wallpaper_directory}, image_filter),
+       [&](auto const & list) {
+         auto service = asio::io_service{};
+         auto socket_path =
+             wanda::system::xdg_path_for(wanda::system::xdg_directory::runtime_dir, wanda::system::environment{}) /
+             ".wanda_interface";
 
-    wanda::get_logger()->info("starting control interface on '{}'", socket_path.native());
-    auto listener = ::listener{list};
-    auto interface = wanda::make_interface(service, socket_path, listener);
+         wanda::system::get_logger()->info("starting control interface on '{}'", socket_path.native());
+         auto listener = ::listener{list};
+         auto interface = wanda::control::make_interface(service, socket_path, listener);
 
-    if (!interface)
-    {
-      wanda::get_logger()->error("failed to start control interface");
-      return;
-    }
+         if (!interface)
+         {
+           wanda::system::get_logger()->error("failed to start control interface");
+           return;
+         }
 
-    if (interface->start())
-    {
-      return;
-    }
+         if (interface->start())
+         {
+           return;
+         }
 
-    auto signals = asio::signal_set{service, SIGINT, SIGTERM};
-    signals.async_wait([&](auto const & error, auto const signal) {
-      if (!error)
-      {
-        wanda::get_logger()->info("Received signal {}. terminating...", signal);
-        interface->shutdown();
-        service.stop();
-      }
-    });
+         auto signals = asio::signal_set{service, SIGINT, SIGTERM};
+         signals.async_wait([&](auto const & error, auto const signal) {
+           if (!error)
+           {
+             wanda::system::get_logger()->info("Received signal {}. terminating...", signal);
+             interface->shutdown();
+             service.stop();
+           }
+         });
 
-    auto wallpaper = wanda::random_pick(list);
-    wanda::set_wallpaper(wallpaper);
+         auto wallpaper = wanda::system::random_pick(list);
+         wanda::system::set_wallpaper(wallpaper);
 
-    service.run();
-  }) ||
-      [&] { wanda::get_logger()->error("wallpaper directory does not exist"); };
+         service.run();
+       }) ||
+      [&] { wanda::system::get_logger()->error("wallpaper directory does not exist"); };
 }

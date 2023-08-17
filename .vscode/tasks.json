@@ -7,14 +7,10 @@
             "command": "conan",
             "args": [
                 "install",
-                "-if",
-                "build",
-                "-pr:b=default",
-                "-pr:h=default",
-                "-b",
-                "missing",
-                "."
-            ],
+                "--build=missing",
+                "--settings:host=build_type=${input:buildType}",
+                "${workspaceFolder}/conanfile.py"
+            ]
         },
         {
             "label": "conan: build",
@@ -22,16 +18,29 @@
             "command": "conan",
             "args": [
                 "build",
-                "-if",
-                "build",
-                "."
+                "--build=missing",
+                "--settings:host=build_type=${input:buildType}",
+                "${workspaceFolder}/conanfile.py"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": "$gcc",
             "dependsOn": "conan: install"
         }
+    ],
+    "inputs": [
+      {
+        "id": "buildType",
+        "type": "pickString",
+        "options": [
+          "Debug",
+          "Release",
+          "RelWithDebInfo",
+          "MinSizeRel"
+        ],
+        "description": "The desired build type.",
+        "default": "Debug"
+      }
     ]
 }

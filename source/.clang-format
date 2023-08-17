@@ -33,12 +33,22 @@ BraceWrapping:
 BreakBeforeInheritanceComma: 'false'
 BreakConstructorInitializers: BeforeComma
 BreakStringLiterals: 'true'
-ColumnLimit: '0'
+ColumnLimit: '120'
 CompactNamespaces: 'false'
 Cpp11BracedListStyle: 'true'
 DerivePointerAlignment: 'false'
 FixNamespaceComments: 'true'
-IncludeBlocks: Preserve
+IncludeBlocks: Regroup
+IncludeCategories:
+  # Local Headers
+  - Regex: '(<|")wanda/.+\.hpp(>|")'
+    Priority: 100
+  # STL Headers
+  - Regex: '<[[:alnum:]._]+(?!\.(h|hpp))>'
+    Priority: 400
+  # General System Headers
+  - Regex: '<([[:alnum:]._]/*)+\.(h|hpp)>'
+    Priority: 300
 IndentCaseLabels: 'true'
 IndentPPDirectives: None
 IndentWidth: '2'
@@ -57,8 +67,8 @@ SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: 'false'
 SpacesBeforeTrailingComments: '2'
 SpacesInAngles: 'false'
-SpacesInCStyleCastParentheses: 'false'
 SpacesInContainerLiterals: 'false'
+SpacesInCStyleCastParentheses: 'false'
 SpacesInParentheses: 'false'
 SpacesInSquareBrackets: 'false'
 Standard: Cpp11
