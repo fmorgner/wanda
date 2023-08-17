@@ -55,6 +55,8 @@ class Wanda(ConanFile):
         cmake.install()
 
     def package_info(self):
+        self.runenv_info.prepend_path("PATH", os.path.join(self.package_folder, "bin"))
+
         self.cpp_info.components["control"].libs = ["wanda-control"]
         self.cpp_info.components["control"].requires = [
             "meta",
