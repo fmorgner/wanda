@@ -11,6 +11,7 @@ class WandaTestConan(ConanFile):
 
     def requirements(self):
         self.requires(self.tested_reference_str)
+        self.requires("asio/[~1.28]")
 
     def build(self):
         cmake = CMake(self)
