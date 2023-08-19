@@ -8,9 +8,15 @@ find_package("fmt" REQUIRED)
 find_package("JPEG" REQUIRED)
 find_package("PNG" REQUIRED)
 find_package("spdlog" REQUIRED)
-find_package("glib" REQUIRED)
 
 find_package("PkgConfig" REQUIRED)
+
+pkg_check_modules("GIO"
+  REQUIRED
+  IMPORTED_TARGET
+  GLOBAL
+  "gio-2.0"
+)
 
 pkg_check_modules("libmagic"
   REQUIRED
@@ -47,12 +53,12 @@ target_link_libraries("wanda-${LIB_NAME}" PUBLIC
 
     "boost::boost"
     "fmt::fmt"
-    "glib::gio-2.0"
     "JPEG::JPEG"
     "PNG::PNG"
     "spdlog::spdlog"
 
     "PkgConfig::libmagic"
+    "PkgConfig::GIO"
 )
 
 install(TARGETS "wanda-${LIB_NAME}"
