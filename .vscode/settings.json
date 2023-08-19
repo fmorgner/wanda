@@ -2,9 +2,6 @@
     "C_Cpp.intelliSenseEngine": "disabled",
 
     "cmake.sourceDirectory": "${workspaceFolder}/source",
-    "cmake.configureOnOpen": false,
-    "cmake.configureOnEdit": false,
-    "cmake.skipConfigureIfCachePresent": true,
     "cmake.useCMakePresets": "always",
     "cmake.mergedCompileCommands": "${workspaceFolder}/compile_commands.json"
 }
