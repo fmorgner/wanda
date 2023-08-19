@@ -8,6 +8,7 @@
             "args": [
                 "install",
                 "--build=missing",
+                "--profile:host=${workspaceFolder}/.conan2/profiles/default",
                 "--settings:host=build_type=${input:buildType}",
                 "${workspaceFolder}/conanfile.py"
             ]
@@ -19,6 +20,7 @@
             "args": [
                 "build",
                 "--build=missing",
+                "--profile:host=${workspaceFolder}/.conan2/profiles/default",
                 "--settings:host=build_type=${input:buildType}",
                 "${workspaceFolder}/conanfile.py"
             ],
