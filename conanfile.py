@@ -30,7 +30,7 @@ class Wanda(ConanFile):
         "asio/[~1.28]",
         "boost/[~1.82]",
         "fmt/[~10.0]",
-        "libjpeg/9e",
+        "libjpeg-turbo/[~3.0]",
         "libpng/[~1.6]",
         "lyra/[~1.6]",
         "spdlog/[~1.12]",
@@ -82,7 +82,7 @@ class Wanda(ConanFile):
             # requires
             "boost::boost",
             "fmt::fmt",
-            "libjpeg::libjpeg",
+            "libjpeg-turbo::jpeg",
             "libpng::libpng",
             "spdlog::spdlog",
         ]
