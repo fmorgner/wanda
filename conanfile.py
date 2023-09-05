@@ -42,6 +42,7 @@ class Wanda(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+        cmake.test(env="CTEST_OUTPUT_ON_FAILURE=1")
 
     def configure(self):
         self.options["boost"].header_only = True

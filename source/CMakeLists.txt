@@ -5,6 +5,8 @@ project("wanda"
   VERSION "1.0.0"
 )
 
+enable_testing()
+
 add_subdirectory("app")
 add_subdirectory("lib")
 add_subdirectory("tests")
