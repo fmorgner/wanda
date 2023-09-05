@@ -28,7 +28,7 @@ target_compile_features("wanda-${LIB_NAME}" PUBLIC
 )
 
 target_link_libraries("wanda-${LIB_NAME}" PUBLIC
-    "fmt::fmt"
+    "fmt::fmt-header-only"
 )
 
 install(TARGETS "wanda-${LIB_NAME}"

@@ -43,6 +43,8 @@ class Wanda(ConanFile):
         cmake.build()
 
     def configure(self):
+        self.options["boost"].header_only = True
+        self.options["fmt"].header_only = True
         self.options["spdlog"].header_only = True
 
     def generate(self):

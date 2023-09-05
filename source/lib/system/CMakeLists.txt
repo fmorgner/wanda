@@ -52,7 +52,7 @@ target_link_libraries("wanda-${LIB_NAME}" PUBLIC
     "wanda::std_ext"
 
     "boost::boost"
-    "fmt::fmt"
+    "fmt::fmt-header-only"
     "JPEG::JPEG"
     "PNG::PNG"
     "spdlog::spdlog_header_only"
