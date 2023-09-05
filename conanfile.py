@@ -35,6 +35,7 @@ class Wanda(ConanFile):
         "lyra/[~1.6]",
         "spdlog/[~1.12]",
     )
+    test_requires = ("catch2/[>=3.4]",)
     tool_requires = ("cmake/[>=3.27]",)
 
     def build(self):
