@@ -34,7 +34,7 @@ target_link_libraries("wanda-${LIB_NAME}" PUBLIC
     "wanda::system"
 
     "asio::asio"
-    "spdlog::spdlog"
+    "spdlog::spdlog_header_only"
 )
 
 install(TARGETS "wanda-${LIB_NAME}"

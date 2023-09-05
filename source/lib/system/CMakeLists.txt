@@ -55,7 +55,7 @@ target_link_libraries("wanda-${LIB_NAME}" PUBLIC
     "fmt::fmt"
     "JPEG::JPEG"
     "PNG::PNG"
-    "spdlog::spdlog"
+    "spdlog::spdlog_header_only"
 
     "PkgConfig::libmagic"
     "PkgConfig::GIO"

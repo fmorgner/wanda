@@ -19,7 +19,7 @@ target_link_libraries("${PROJECT_NAME}c" PRIVATE
 
   "asio::asio"
   "bfg::lyra"
-  "spdlog::spdlog"
+  "spdlog::spdlog_header_only"
 )
 
 set_target_properties("wandac" PROPERTIES
@@ -44,7 +44,7 @@ target_link_libraries("wandad" PRIVATE
 
   "asio::asio"
   "bfg::lyra"
-  "spdlog::spdlog"
+  "spdlog::spdlog_header_only"
 )
 
 set_target_properties("wandad" PROPERTIES

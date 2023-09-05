@@ -42,6 +42,9 @@ class Wanda(ConanFile):
         cmake.configure()
         cmake.build()
 
+    def configure(self):
+        self.options["spdlog"].header_only = True
+
     def generate(self):
         toolchain = CMakeToolchain(self)
         toolchain.variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = True
