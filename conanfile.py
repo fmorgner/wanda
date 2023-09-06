@@ -28,8 +28,7 @@ class Wanda(ConanFile):
     exports_sources = ("source/*",)
     requires = (
         "asio/[~1.28]",
-        "boost/[~1.82]",
-        "fmt/[~10.0]",
+        "boost/[~1.83]",
         "libjpeg-turbo/[~3.0]",
         "libpng/[~1.6]",
         "lyra/[~1.6]",
