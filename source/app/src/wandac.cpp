@@ -4,7 +4,8 @@
 #include <wanda/system/logging.hpp>
 #include <wanda/system/xdg.hpp>
 
-#include <asio.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/post.hpp>
 #include <lyra/lyra.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -39,7 +40,7 @@ struct cli
 
 struct listener : wanda::control::commander::listener
 {
-  listener(::cli & cli, asio::io_service & service)
+  listener(::cli & cli, boost::asio::io_context & service)
       : m_cli{cli}
       , m_service{service}
   {
@@ -50,13 +51,14 @@ struct listener : wanda::control::commander::listener
     if (m_cli.command == "change")
     {
       commander.send(wanda::proto::make_change_command());
-      m_service.post([&] { commander.stop(); });
+
+      post(m_service, [&] { commander.stop(); });
     }
   }
 
 private:
   ::cli & m_cli;
-  asio::io_service & m_service;
+  boost::asio::io_context & m_service;
 };
 
 int main(int argc, char const * const * argv)
@@ -77,7 +79,7 @@ int main(int argc, char const * const * argv)
   auto interface =
       wanda::system::xdg_path_for(wanda::system::xdg_directory::runtime_dir, wanda::system::environment{}) /
       ".wanda_interface";
-  auto service = asio::io_service{};
+  auto service = boost::asio::io_context{};
   auto listener = ::listener{cli, service};
 
   auto commander = wanda::control::commander{service, interface, listener};

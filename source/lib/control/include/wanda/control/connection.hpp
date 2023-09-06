@@ -4,7 +4,8 @@
 #include "wanda/meta/keyed.hpp"
 #include "wanda/proto/message.hpp"
 
-#include <asio.hpp>
+#include <boost/asio/local/stream_protocol.hpp>
+#include <boost/asio/streambuf.hpp>
 
 #include <istream>
 #include <memory>
@@ -20,7 +21,7 @@ namespace wanda::control
    */
   struct connection : meta::keyed<connection>, std::enable_shared_from_this<connection>
   {
-    using protocol = asio::local::stream_protocol;
+    using protocol = boost::asio::local::stream_protocol;
     using pointer = std::shared_ptr<connection>;
 
     /**
@@ -47,7 +48,8 @@ namespace wanda::control
      * @internal
      * @brief Construct a new control connection object
      *
-     * @note This constructor is keyed on a private key type so it can only be constructed using the #wanda::make_connection factory
+     * @note This constructor is keyed on a private key type so it can only be constructed using the
+     * #wanda::make_connection factory
      */
     connection(key, protocol::socket socket);
 
@@ -96,8 +98,8 @@ namespace wanda::control
     void perform_read();
 
     protocol::socket m_socket;
-    asio::streambuf m_in{};
-    asio::streambuf m_out{};
+    boost::asio::streambuf m_in{};
+    boost::asio::streambuf m_out{};
     std::istream m_input{&m_in};
     std::ostream m_output{&m_out};
     std::set<listener *> m_listeners{};

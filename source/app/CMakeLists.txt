@@ -2,7 +2,7 @@ include("CheckIPOSupported")
 
 check_ipo_supported(RESULT "WANDA_IPO_SUPPORTED")
 
-find_package("asio")
+find_package("Boost")
 find_package("lyra")
 find_package("spdlog")
 
@@ -17,7 +17,7 @@ target_link_libraries("${PROJECT_NAME}c" PRIVATE
   "wanda::proto"
   "wanda::system"
 
-  "asio::asio"
+  "Boost::boost"
   "bfg::lyra"
   "spdlog::spdlog_header_only"
 )
@@ -42,7 +42,7 @@ target_link_libraries("wandad" PRIVATE
   "wanda::std_ext"
   "wanda::system"
 
-  "asio::asio"
+  "Boost::boost"
   "bfg::lyra"
   "spdlog::spdlog_header_only"
 )

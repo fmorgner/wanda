@@ -33,7 +33,6 @@ target_link_libraries("wanda-${LIB_NAME}" PUBLIC
     "wanda::proto"
     "wanda::system"
 
-    "asio::asio"
     "spdlog::spdlog_header_only"
 )
 

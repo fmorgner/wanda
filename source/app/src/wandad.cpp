@@ -8,7 +8,8 @@
 #include <wanda/system/wallpaper.hpp>
 #include <wanda/system/xdg.hpp>
 
-#include <asio.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/signal_set.hpp>
 #include <lyra/lyra.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -106,7 +107,7 @@ int main(int argc, char const * const * argv)
 
   with(wanda::system::scan({cli.wallpaper_directory}, image_filter),
        [&](auto const & list) {
-         auto service = asio::io_service{};
+         auto service = boost::asio::io_context{};
          auto socket_path =
              wanda::system::xdg_path_for(wanda::system::xdg_directory::runtime_dir, wanda::system::environment{}) /
              ".wanda_interface";
@@ -126,7 +127,7 @@ int main(int argc, char const * const * argv)
            return;
          }
 
-         auto signals = asio::signal_set{service, SIGINT, SIGTERM};
+         auto signals = boost::asio::signal_set{service, SIGINT, SIGTERM};
          signals.async_wait([&](auto const & error, auto const signal) {
            if (!error)
            {

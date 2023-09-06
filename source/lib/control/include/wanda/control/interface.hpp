@@ -11,7 +11,8 @@
 #include "wanda/meta/keyed.hpp"
 #include "wanda/proto/command.hpp"
 
-#include <asio.hpp>
+#include <boost/asio/local/stream_protocol.hpp>
+#include <boost/asio/io_context.hpp>
 #include <spdlog/spdlog.h>
 
 #include <cstddef>
@@ -40,7 +41,7 @@ namespace wanda::control
    */
   struct interface : connection::listener, meta::keyed<interface>, std::enable_shared_from_this<interface>
   {
-    using protocol = asio::local::stream_protocol;
+    using protocol = boost::asio::local::stream_protocol;
     using pointer = std::shared_ptr<interface>;
 
     /**
@@ -57,7 +58,7 @@ namespace wanda::control
      *
      * @note This constructor is keyed on a private key type so it can only be constructed using the #wanda::make_interface factory
      */
-    interface(key, asio::io_service & service, protocol::endpoint endpoint, listener & listener);
+    interface(key, boost::asio::io_context & service, protocol::endpoint endpoint, listener & listener);
 
     /**
      * @brief Start handling of controller connections
@@ -75,9 +76,9 @@ namespace wanda::control
   private:
     void perform_accept();
 
-    friend pointer make_interface(asio::io_service & service, std::filesystem::path file, interface::listener & listener);
+    friend pointer make_interface(boost::asio::io_context & service, std::filesystem::path file, interface::listener & listener);
 
-    asio::io_service & m_service;
+    boost::asio::io_context & m_service;
     protocol::endpoint m_endpoint;
     protocol::socket m_socket;
     protocol::acceptor m_acceptor;
@@ -89,7 +90,7 @@ namespace wanda::control
   /**
    * @brief A factory to create new #interface instances
    */
-  interface::pointer make_interface(asio::io_service & service, std::filesystem::path socket, interface::listener & listener);
+  interface::pointer make_interface(boost::asio::io_context & service, std::filesystem::path socket, interface::listener & listener);
 
 }  // namespace wanda::control
 

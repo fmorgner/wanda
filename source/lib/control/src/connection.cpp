@@ -2,7 +2,11 @@
 
 #include "wanda/proto/message.hpp"
 
-#include <asio.hpp>
+#include <boost/asio/completion_condition.hpp>
+#include <boost/asio/read_until.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/system/detail/error_code.hpp>
+#include <boost/system/error_code.hpp>
 
 #include <limits>
 
@@ -42,7 +46,7 @@ namespace wanda::control
   void connection::send(proto::message message)
   {
     m_output << message << '\n';
-    asio::async_write(m_socket, m_out, asio::transfer_exactly(message.size() + 1), [that = shared_from_this(), this](auto const & error, auto const length) {
+    boost::asio::async_write(m_socket, m_out, boost::asio::transfer_exactly(message.size() + 1), [that = shared_from_this(), this](auto const & error, auto const length) {
       if (error)
       {
         // TODO: Handle error
@@ -56,7 +60,9 @@ namespace wanda::control
 
   void connection::close()
   {
-    if (auto error = std::error_code{}; m_socket.cancel(error))
+    auto error = boost::system::error_code{};
+
+    if (m_socket.cancel(error), error)
     {
       for (auto & listener : m_listeners)
       {
@@ -64,7 +70,7 @@ namespace wanda::control
       }
     }
 
-    if (auto error = std::error_code{}; m_socket.close(error))
+    if (m_socket.close(error), error)
     {
       for (auto & listener : m_listeners)
       {
@@ -91,7 +97,7 @@ namespace wanda::control
 
   void connection::perform_read()
   {
-    asio::async_read_until(m_socket, m_in, '\n', [that = shared_from_this(), this](auto const & error, auto const length) {
+    boost::asio::async_read_until(m_socket, m_in, '\n', [that = shared_from_this(), this](auto const & error, auto const length) {
       if (error)
       {
         for (auto & listener : m_listeners)

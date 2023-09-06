@@ -5,11 +5,12 @@
 #include "wanda/std_ext/optional.hpp"
 #include "wanda/system/logging.hpp"
 
+#include <boost/asio/io_context.hpp>
 #include <spdlog/fmt/ostr.h>
 
 namespace wanda::control
 {
-  commander::commander(asio::io_service & service, std::filesystem::path socket, listener & listener)
+  commander::commander(boost::asio::io_context & service, std::filesystem::path socket, listener & listener)
       : m_service{service}
       , m_endpoint{socket.string()}
       , m_socket{service}

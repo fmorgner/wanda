@@ -5,6 +5,8 @@
 #include "wanda/system/logging.hpp"
 
 #include <spdlog/fmt/ostr.h>
+#include <boost/system/error_code.hpp>
+#include <boost/asio/error.hpp>
 #include <unistd.h>
 
 #include <algorithm>
@@ -27,7 +29,7 @@ namespace wanda::control
 
   // 'interface' implementation
 
-  interface::interface(interface::key key, asio::io_service & service, interface::protocol::endpoint endpoint, listener & listener)
+  interface::interface(interface::key key, boost::asio::io_context & service, interface::protocol::endpoint endpoint, listener & listener)
       : keyed{key}
       , m_service{service}
       , m_endpoint{std::move(endpoint)}
@@ -39,17 +41,17 @@ namespace wanda::control
 
   std::error_code interface::start()
   {
-    if (auto error = std::error_code{}; m_acceptor.open(m_endpoint.protocol(), error))
+    if (auto error = boost::system::error_code{}; m_acceptor.open(m_endpoint.protocol(), error), error)
     {
       return error;
     }
 
-    if (auto error = std::error_code{}; m_acceptor.bind(m_endpoint, error))
+    if (auto error = boost::system::error_code{}; m_acceptor.bind(m_endpoint, error), error)
     {
       return error;
     }
 
-    if (auto error = std::error_code{}; m_acceptor.listen(128, error))
+    if (auto error = boost::system::error_code{}; m_acceptor.listen(128, error), error)
     {
       return error;
     }
@@ -67,14 +69,14 @@ namespace wanda::control
       connection->close();
     }
 
-    auto error = std::error_code{};
-    return m_acceptor.close(error);
+    auto error = boost::system::error_code{};
+    return m_acceptor.close(error), error;
   }
 
   void interface::perform_accept()
   {
     m_acceptor.async_accept(m_socket, [that = shared_from_this(), this](auto const & error) {
-      if (error && error != asio::error::operation_aborted)
+      if (error && error != boost::asio::error::operation_aborted)
       {
         system::get_logger()->error("failed to accept connection because '{}'", error.message());
       }
@@ -140,7 +142,7 @@ namespace wanda::control
     }
   }
 
-  interface::pointer make_interface(asio::io_service & service, std::filesystem::path socket, interface::listener & listener)
+  interface::pointer make_interface(boost::asio::io_context & service, std::filesystem::path socket, interface::listener & listener)
   {
     if (std::filesystem::exists(socket))
     {

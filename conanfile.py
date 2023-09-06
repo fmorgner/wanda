@@ -27,7 +27,6 @@ class Wanda(ConanFile):
     )
     exports_sources = ("source/*",)
     requires = (
-        "asio/[~1.28]",
         "boost/[~1.83]",
         "libjpeg-turbo/[~3.0]",
         "libpng/[~1.6]",
@@ -44,6 +43,7 @@ class Wanda(ConanFile):
         cmake.test(env="CTEST_OUTPUT_ON_FAILURE=1")
 
     def configure(self):
+        self.options["boost"].asio_no_deprecated = True
         self.options["boost"].header_only = True
         self.options["fmt"].header_only = True
         self.options["spdlog"].header_only = True

@@ -5,7 +5,8 @@
 #include "wanda/proto/command.hpp"
 #include "wanda/proto/message.hpp"
 
-#include <asio.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/io_service.hpp>
 
 #include <filesystem>
 #include <memory>
@@ -34,7 +35,7 @@ namespace wanda::control
     /**
      * @brief Construct a new commander
      */
-    commander(asio::io_service & service, std::filesystem::path socket, listener & listener);
+    commander(boost::asio::io_context & service, std::filesystem::path socket, listener & listener);
 
     /**
      * @brief Start communication with the remote daemon endpoint
@@ -55,7 +56,7 @@ namespace wanda::control
     void on_received(connection::pointer connection, proto::message message) override;
 
   private:
-    asio::io_service & m_service;
+    boost::asio::io_context & m_service;
     wanda::control::connection::protocol::endpoint m_endpoint;
     wanda::control::connection::protocol::socket m_socket;
     wanda::control::connection::pointer m_connection;
