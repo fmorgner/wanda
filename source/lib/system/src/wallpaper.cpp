@@ -10,7 +10,7 @@
 #include <boost/gil/extension/io/png.hpp>
 #include <boost/gil/extension/numeric/resample.hpp>
 #include <boost/gil/extension/numeric/sampler.hpp>
-#include <fmt/format.h>
+#include <spdlog/fmt/fmt.h>
 
 #include <algorithm>
 #include <cmath>
@@ -67,10 +67,10 @@ namespace wanda::system
 
     auto image = load_image(wallpaper);
     auto color = average_colors(std::move(image));
-    auto hexstring = fmt::format("#{:02X}{:02X}{:02X}",
-                                 static_cast<std::uint8_t>(at_c<0>(color)),
-                                 static_cast<std::uint8_t>(at_c<1>(color)),
-                                 static_cast<std::uint8_t>(at_c<2>(color)));
+    auto hexstring = spdlog::fmt_lib::format("#{:02X}{:02X}{:02X}",
+                                             static_cast<std::uint8_t>(at_c<0>(color)),
+                                             static_cast<std::uint8_t>(at_c<1>(color)),
+                                             static_cast<std::uint8_t>(at_c<2>(color)));
 
     with("org.gnome.desktop.background"_setting, [&](auto & setting) {
       with(setting["primary-color"_key], [&](auto & value) {

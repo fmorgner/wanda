@@ -7,7 +7,7 @@
 #ifndef WANDA_PROTO_MESSAGE_HPP
 #define WANDA_PROTO_MESSAGE_HPP
 
-#include <fmt/core.h>
+#include <spdlog/common.h>
 
 #include <cstddef>
 #include <istream>
@@ -76,7 +76,7 @@ namespace wanda::proto
 }  // namespace wanda::proto
 
 template<>
-struct fmt::formatter<wanda::proto::message> : fmt::formatter<std::string>
+struct spdlog::fmt_lib::formatter<wanda::proto::message> : spdlog::fmt_lib::formatter<std::string>
 {
   auto format(wanda::proto::message const & message, format_context & context) const -> decltype(context.out());
 };

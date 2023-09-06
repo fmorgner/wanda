@@ -26,27 +26,27 @@ class Wanda(ConanFile):
         "build_type",
     )
     exports_sources = ("source/*",)
-    requires = (
-        "boost/[~1.83]",
-        "libjpeg-turbo/[~3.0]",
-        "libpng/[~1.6]",
-        "lyra/[~1.6]",
-        "spdlog/[~1.12]",
-    )
     test_requires = ("catch2/[>=3.4]",)
     tool_requires = ("cmake/[>=3.27]",)
+
+    def requirements(self):
+        self.requires("boost/[~1.83]", transitive_headers=True, options={
+            "asio_no_deprecated": True,
+            "system_no_deprecated": True,
+            "header_only": True,
+        })
+        self.requires("libjpeg-turbo/[~3.0]")
+        self.requires("libpng/[~1.6]")
+        self.requires("lyra/[~1.6]")
+        self.requires("spdlog/[~1.12]", transitive_headers=True, options={
+            "header_only": True,
+        })
 
     def build(self):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
         cmake.test(env="CTEST_OUTPUT_ON_FAILURE=1")
-
-    def configure(self):
-        self.options["boost"].asio_no_deprecated = True
-        self.options["boost"].header_only = True
-        self.options["fmt"].header_only = True
-        self.options["spdlog"].header_only = True
 
     def generate(self):
         toolchain = CMakeToolchain(self)
@@ -70,14 +70,14 @@ class Wanda(ConanFile):
             "std_ext",
             "system",
             # requires
-            "asio::asio",
+            "boost::headers",
             "spdlog::spdlog",
         ]
 
         self.cpp_info.components["meta"].libs = []
 
         self.cpp_info.components["proto"].libs = ["wanda-proto"]
-        self.cpp_info.components["proto"].requires = ["fmt::fmt"]
+        self.cpp_info.components["proto"].requires = ["spdlog::spdlog",]
 
         self.cpp_info.components["std_ext"].libs = []
 
@@ -86,8 +86,7 @@ class Wanda(ConanFile):
             "meta",
             "std_ext",
             # requires
-            "boost::boost",
-            "fmt::fmt",
+            "boost::headers",
             "libjpeg-turbo::jpeg",
             "libpng::libpng",
             "spdlog::spdlog",
@@ -99,7 +98,6 @@ class Wanda(ConanFile):
             "proto",
             "system",
             # requires
-            "asio::asio",
             "lyra::lyra",
             "spdlog::spdlog",
         ]
@@ -114,7 +112,6 @@ class Wanda(ConanFile):
             "std_ext",
             "system",
             # requires
-            "asio::asio",
             "lyra::lyra",
             "spdlog::spdlog",
         ]

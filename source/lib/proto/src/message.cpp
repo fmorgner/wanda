@@ -1,6 +1,6 @@
 #include "wanda/proto/message.hpp"
 
-#include <fmt/format.h>
+#include <spdlog/common.h>
 
 #include <ios>
 #include <iterator>
@@ -76,7 +76,7 @@ namespace wanda::proto
 
 }  // namespace wanda::proto
 
-auto fmt::formatter<wanda::proto::message>::format(wanda::proto::message const & message, format_context & context) const -> decltype(context.out())
+auto spdlog::fmt_lib::formatter<wanda::proto::message>::format(wanda::proto::message const & message, format_context & context) const -> decltype(context.out())
 {
   return formatter<std::string>::format(static_cast<std::string>(message), context);
 }

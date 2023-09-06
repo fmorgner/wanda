@@ -3,7 +3,7 @@ cmake_path(GET CMAKE_CURRENT_SOURCE_DIR STEM LIB_NAME)
 file(GLOB_RECURSE LIB_HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "**/*.hpp")
 file(GLOB_RECURSE LIB_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "**/*.cpp")
 
-find_package("fmt" REQUIRED)
+find_package("spdlog")
 
 add_library("wanda-${LIB_NAME}"
     ${LIB_SOURCES}
@@ -28,7 +28,7 @@ target_compile_features("wanda-${LIB_NAME}" PUBLIC
 )
 
 target_link_libraries("wanda-${LIB_NAME}" PUBLIC
-    "fmt::fmt-header-only"
+    "spdlog::spdlog_header_only"
 )
 
 install(TARGETS "wanda-${LIB_NAME}"

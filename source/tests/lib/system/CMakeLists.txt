@@ -2,7 +2,7 @@ add_executable("wanda-tests-system"
     "src/xdg.cpp"
 )
 
-target_link_libraries("wanda-tests-system"
+target_link_libraries("wanda-tests-system" PRIVATE
     "wanda::system"
 
     "Catch2::Catch2WithMain"
