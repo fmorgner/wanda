@@ -41,8 +41,11 @@ FixNamespaceComments: 'true'
 IncludeBlocks: Regroup
 IncludeCategories:
   # Local Headers
-  - Regex: '(<|")wanda/.+\.hpp(>|")'
+  - Regex: '"wanda[cd]?/.+\.hpp"'
     Priority: 100
+  # Local Headers
+  - Regex: '<wanda[cd]?/.+\.hpp>'
+    Priority: 110
   # STL Headers
   - Regex: '<[[:alnum:]._]+(?!\.(h|hpp))>'
     Priority: 400
