@@ -5,7 +5,7 @@ file(GLOB_RECURSE LIB_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_D
 
 find_package("spdlog")
 
-add_library("wanda-${LIB_NAME}"
+add_library("wanda-${LIB_NAME}" ${WANDA_LIBRARY_TYPE}
     ${LIB_SOURCES}
 )
 
@@ -31,8 +31,10 @@ target_link_libraries("wanda-${LIB_NAME}" PUBLIC
     "spdlog::spdlog_header_only"
 )
 
-install(TARGETS "wanda-${LIB_NAME}"
-    FILE_SET HEADERS
-)
+if(NOT WANDA_APPLICATIONS_ONLY)
+    install(TARGETS "wanda-${LIB_NAME}"
+        FILE_SET HEADERS
+    )
+endif()
 
 add_library("wanda::${LIB_NAME}" ALIAS "wanda-${LIB_NAME}")

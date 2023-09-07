@@ -24,7 +24,7 @@ pkg_check_modules("libmagic"
   "libmagic"
 )
 
-add_library("wanda-${LIB_NAME}"
+add_library("wanda-${LIB_NAME}" ${WANDA_LIBRARY_TYPE}
     ${LIB_SOURCES}
 )
 
@@ -59,8 +59,10 @@ target_link_libraries("wanda-${LIB_NAME}" PUBLIC
     "PkgConfig::GIO"
 )
 
-install(TARGETS "wanda-${LIB_NAME}"
-    FILE_SET HEADERS
-)
+if(NOT WANDA_APPLICATIONS_ONLY)
+    install(TARGETS "wanda-${LIB_NAME}"
+        FILE_SET HEADERS
+    )
+endif()
 
 add_library("wanda::${LIB_NAME}" ALIAS "wanda-${LIB_NAME}")

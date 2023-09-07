@@ -22,8 +22,10 @@ target_compile_features("wanda-${LIB_NAME}" INTERFACE
     "cxx_std_20"
 )
 
-install(TARGETS "wanda-${LIB_NAME}"
-    FILE_SET HEADERS
-)
+if(NOT WANDA_APPLICATIONS_ONLY)
+    install(TARGETS "wanda-${LIB_NAME}"
+        FILE_SET HEADERS
+    )
+endif()
 
 add_library("wanda::${LIB_NAME}" ALIAS "wanda-${LIB_NAME}")

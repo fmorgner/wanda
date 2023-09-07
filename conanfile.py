@@ -11,14 +11,21 @@ class Wanda(ConanFile):
     url = "https://github.com/fmorgner/wanda"
     license = "BSD 3-clause"
     description = "A wallpaper changer for the GNOME"
+    package_type = "library"
     scm = {
         "type": "git",
         "url": "auto",
         "revision": "auto",
     }
     generators = ("CMakeDeps",)
-    options = {"shared": [True, False]}
-    default_options = {"shared": False}
+    options = {
+        "nolibs": [True, False],
+        "shared": [True, False],
+    }
+    default_options = {
+        "nolibs": False,
+        "shared": False,
+    }
     settings = (
         "os",
         "arch",
@@ -30,7 +37,7 @@ class Wanda(ConanFile):
     tool_requires = ("cmake/[>=3.27]",)
 
     def requirements(self):
-        self.requires("boost/[~1.83]", transitive_headers=True, options={
+        self.requires("boost/[~1.83]", transitive_headers=not self.options.nolibs, options={
             "asio_no_deprecated": True,
             "system_no_deprecated": True,
             "header_only": True,
@@ -38,7 +45,7 @@ class Wanda(ConanFile):
         self.requires("libjpeg-turbo/[~3.0]")
         self.requires("libpng/[~1.6]")
         self.requires("lyra/[~1.6]")
-        self.requires("spdlog/[~1.12]", transitive_headers=True, options={
+        self.requires("spdlog/[~1.12]", transitive_headers=not self.options.nolibs, options={
             "header_only": True,
         })
 
@@ -48,9 +55,14 @@ class Wanda(ConanFile):
         cmake.build()
         cmake.test(env="CTEST_OUTPUT_ON_FAILURE=1")
 
+    def configure(self):
+        if self.options.nolibs:
+            self.package_type = "application"
+
     def generate(self):
         toolchain = CMakeToolchain(self)
         toolchain.variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = True
+        toolchain.variables["WANDA_APPLICATIONS_ONLY"] = self.options.nolibs
         toolchain.generate()
 
     def layout(self):
@@ -62,6 +74,9 @@ class Wanda(ConanFile):
 
     def package_info(self):
         self.runenv_info.prepend_path("PATH", os.path.join(self.package_folder, "bin"))
+
+        if self.options.nolibs:
+            return
 
         self.cpp_info.components["control"].libs = ["wanda-control"]
         self.cpp_info.components["control"].requires = [

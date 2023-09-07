@@ -13,14 +13,27 @@ class WandaTestConan(ConanFile):
         self.requires(self.tested_reference_str)
 
     def build(self):
+        if self._apps_only:
+            return
+
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
-    
+
     def layout(self):
         cmake_layout(self)
-    
+
     def test(self):
-        if can_run(self):
+        if not can_run(self):
+            return
+
+        if self._apps_only:
+            self.run("wandad -h", env="conanrun")
+            self.run("wandac -h", env="conanrun")
+        else:
             cmd = os.path.join(self.cpp.build.bindir, "test")
             self.run(cmd, env="conanrun")
+
+    @property
+    def _apps_only(self):
+        return self.dependencies[self.tested_reference_str].options.nolibs
