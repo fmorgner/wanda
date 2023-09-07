@@ -24,7 +24,9 @@ struct cli
 
   auto parse(int argc, char const * const * argv, std::ostream & error)
   {
-    parser |= lyra::arg{command, "command"}("The command to send to the deamon").required() | lyra::help(help);
+    parser |=  //
+        lyra::help(help) |  //
+        lyra::arg{command, "command"}("The command to send to the deamon").required();
 
     auto result = parser.parse({argc, argv});
 

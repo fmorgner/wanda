@@ -44,8 +44,9 @@ namespace
 
     auto parse(int argc, char const * const * argv, std::ostream & error)
     {
-      parser |=
-          lyra::arg{wallpaper_directory, "directory"}("The wallpaper source directory").required() | lyra::help(help);
+      parser |=  //
+          lyra::help(help) |  //
+          lyra::arg{wallpaper_directory, "directory"}("The wallpaper source directory").required();
 
       auto result = parser.parse({argc, argv});
 
