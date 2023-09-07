@@ -1,6 +1,3 @@
-find_package("lyra")
-find_package("spdlog")
-
 add_executable("wandad"
   "src/main.cpp"
 )

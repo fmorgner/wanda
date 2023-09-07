@@ -1,8 +1,3 @@
-find_package("lyra")
-find_package("spdlog")
-
-#[=====[ Client ]=====]
-
 add_executable("wandac"
   "src/main.cpp"
 )

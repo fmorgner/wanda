@@ -3,11 +3,6 @@ cmake_path(GET CMAKE_CURRENT_SOURCE_DIR STEM LIB_NAME)
 file(GLOB_RECURSE LIB_HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "**/*.hpp")
 file(GLOB_RECURSE LIB_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "**/*.cpp")
 
-find_package("Boost" REQUIRED COMPONENTS "headers")
-find_package("JPEG" REQUIRED)
-find_package("PNG" REQUIRED)
-find_package("spdlog" REQUIRED)
-
 find_package("PkgConfig" REQUIRED)
 
 pkg_check_modules("GIO"
