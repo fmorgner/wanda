@@ -62,6 +62,9 @@ class Wanda(ConanFile):
     def generate(self):
         toolchain = CMakeToolchain(self)
         toolchain.variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = True
+        toolchain.variables["WANDA_DESCRIPTION"] = self.description
+        toolchain.variables["WANDA_HOMEPAGE_URL"] = self.url
+        toolchain.variables["WANDA_VERSION"] = self.version
         toolchain.variables["WANDA_APPLICATIONS_ONLY"] = self.options.nolibs
         toolchain.generate()
 

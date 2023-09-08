@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION "3.27")
 
 project("wanda"
+  DESCRIPTION "${WANDA_DESCRIPTION}"
+  HOMEPAGE_URL "${WANDA_HOMEPAGE_URL}"
   LANGUAGES CXX
-  VERSION "1.0.0"
+  VERSION "${WANDA_VERSION}"
 )
 
 find_package("Boost" REQUIRED COMPONENTS "headers")
